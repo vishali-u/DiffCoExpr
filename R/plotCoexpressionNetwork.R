@@ -16,7 +16,7 @@
 #' network_graph
 #' 
 #' @export
-#' @import igraph
+#' @importFrom igraph graph_from_data_frame layout_with_fr
 plotCoexpressionNetwork <- function(edge_list) {
   network_graph <- igraph::graph_from_data_frame(edge_list, 
                                                  directed = FALSE)

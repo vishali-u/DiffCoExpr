@@ -23,7 +23,7 @@
 #' \href{https://doi.org/10.1186/s12859-021-04179-4}{Link}.
 #' 
 #' @export
-#' @import dplyr
+#' @importFrom dplyr top_frac
 #' @import ComplexHeatmap
 getCorrelationMatrix <- function(expression_matrix) {
   
