@@ -3,14 +3,14 @@
 #' 
 #' @param expression_matrix A matrix containing the expression levels of genes
 #'    per cell. The rows are genes and the columns are cells
-#' @param visualize A boolean that will be used to determine if the function
-#'    should also create a heatmap of the correlation matrix. Default is set
-#'    to FALSE. 
 #'    
 #' @return A matrix where the rows and columns are genes, and the cell contains
 #'    the correlation between the two genes
+#'    
 #' @examples
 #' # Using saved Seurat object in the Data folder
+#' 
+#' TODO: removed the srat object from the data folder, must use the raw data and prepareData function
 #' srat <- readRds(file = "data/pbmc_srat.rds")
 #' expr_matrix <- getExpressionMatrix(srat = srat)
 #' corr_matrix <- getCorrelationMatrix(expression_matrix = expr_matrix)
@@ -25,8 +25,7 @@
 #' @export
 #' @import dplyr
 #' @import ComplexHeatmap
-getCorrelationMatrix <- function(expression_matrix, 
-                                 visualize = FALSE) {
+getCorrelationMatrix <- function(expression_matrix) {
   
   # Filter out genes with zero variation
   # Calculate standard deviation for each gene

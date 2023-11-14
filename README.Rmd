@@ -71,23 +71,23 @@ The author of the package is Vishali Umaiyalan. The author wrote the *prepareDat
 
 ## References
 
-- Chowdhury H., Bhattacharyya D., Kalita J (2020) (Differential) Co-Expression Analysis of Gene Expression: A survey of Best Practices. *IEEE/ACM Transactions on Computational Biology and Bioinformatics* 17. https://ieeexplore.ieee.org/document/8613814
+- Butler A, Hoffman P, Smibert P, Papalexi E, Satija R (2018) Integrating single-cell transcriptomic data across different conditions, technologies, and species. *Nature Biotechnology* 36, 411-420. https://doi.org/10.1038/nbt.4096
 
-- Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A (2021) GWENA: gene co-expression networks analysis and extended modules characterization in a single Bioconductor package. *BMC Bioinformatics* 22. https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04179-4
+- Butler, A. (2015). Seurat: Tools for Single Cell Genomics R package. https://cran.r-project.org/web/packages/Seurat
+
+- Chowdhury H., Bhattacharyya D., Kalita J (2020) (Differential) Co-Expression Analysis of Gene Expression: A survey of Best Practices. *IEEE/ACM Transactions on Computational Biology and Bioinformatics* 17. https://ieeexplore.ieee.org/document/8613814
 
 - Contreras-Lopez, Moyano T., Soto D., Gutierrez R (2018) Step-by-Step Construction of Gene Co-expression Networks from High-Throughput Arabidopsis RNA Sequencing Data. *Methods in Molecular Biology* https://pubmed.ncbi.nlm.nih.gov/29525965/
 
 - Eisen M., Spellman P., Brown P., Botstein D (1998) Cluster analysis and display of genome-wide expression patterns. *Biological Sciences* 95. https://www.pnas.org/doi/10.1073/pnas.95.25.14863
 
+- Hennetin J., Pehkonen P., Bellis M (2009) Construction and use of gene expression covariation matrix. *BMC Bioinformatics* 10. https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-214
+
+- Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A (2021) GWENA: gene co-expression networks analysis and extended modules characterization in a single Bioconductor package. *BMC Bioinformatics* 22. https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04179-4
+
 - R Core Team (2023). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/
 
 - Su C., Xu Z., Shan X., Cai B., Zhao H., Zhang J (2023) Cell-type-specific co-expression inference from single cell RNA-sequencing data. *Nature Communications* 14. https://www.nature.com/articles/s41467-023-40503-7
-
-- Hennetin J., Pehkonen P., Bellis M (2009) Construction and use of gene expression covariation matrix. *BMC Bioinformatics* 10. https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-214
-
-- Butler A, Hoffman P, Smibert P, Papalexi E, Satija R (2018) Integrating single-cell transcriptomic data across different conditions, technologies, and species. *Nature Biotechnology* 36, 411-420. https://doi.org/10.1038/nbt.4096
-
-- Butler, A. (2015). Seurat: Tools for Single Cell Genomics R package. https://cran.r-project.org/web/packages/Seurat
 
 - Wickham, H. and Bryan, J. (2019). *R Packages* (2nd edition). Newton, Massachusetts: O'Reilly Media. https://r-pkgs.org/
 
