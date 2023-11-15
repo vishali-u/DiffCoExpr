@@ -26,6 +26,7 @@ Create (and visualize) the expression matrix for single-cell RNA-seq data
 }
 \examples{
 # Using saved Seurat object in the Data folder
+TODO: removed the srat object from the data folder, must use the raw data and prepareData function
 srat <- readRds(file = "data/pbmc_srat.rds")
 expr_matrix <- get_expression_matrix(srat = srat)
 expr_matrix
