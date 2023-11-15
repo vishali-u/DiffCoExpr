@@ -1,6 +1,6 @@
 library(DiffCoExpr)
 
-test_that("valid input", {
+test_that("Expression matrix has right number of columns", {
   srat <- prepareData(
     gene_bc_matrix_path = "inst/extdata/pbmc/filtered_gene_bc_matrices",
     cell_types_path = "inst/extdata/pbmc/cell_types.csv"
