@@ -20,7 +20,8 @@ analysis by operating at the single-cell level; most existing
 co-expression analysis tools use bulk-RNA-seq or microarray data. As
 such, most existing packages do not contain any functions that can only
 be applied to single-cell data (e.g., cell-type-specificity analysis).
-<br> The `DiffCoExpr` package was developed using `R version 4.3.0`,
+
+The `DiffCoExpr` package was developed using `R version 4.3.0`,
 `Platform: x86_64-apple-darwin20.0/12.2.0 (64-bit)` and
 `Running under: macOS Sonoma 14.1`.
 
