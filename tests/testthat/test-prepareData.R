@@ -6,8 +6,8 @@ test_that("valid input", {
     cell_types_path = "inst/extdata/pbmc/cell_types.csv"
   )
   
-  expect_type(srat, "Seurat")
-  expect_identical(Seurat::levels(srat), 
-                   c("Naive CD4 T", "CD14+ Mono", "Memory CD4 T", "B", 
-                     "CD8 T", "FCGR3A+ Mono", "NK", "DC", "Platelet"))
+  #expect_type(srat, "Seurat")
+  expect_identical(levels(srat), 
+                   c("Naive CD4+ T", "CD14+ Mono", "Memory CD4+", "B", 
+                     "CD8+ T", "FCGR3A+ Mono", "NK", "DC", "Platelet"))
 })

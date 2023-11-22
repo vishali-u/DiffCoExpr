@@ -19,6 +19,6 @@ test_that("All edges have a positive correlation", {
     correlation_matrix = corr_matrix
   )
   
-  expect_true(network$weight)
+  expect_true(all(network$weight > 0))
   
 })

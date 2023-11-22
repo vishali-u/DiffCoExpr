@@ -10,7 +10,7 @@
 #' @examples
 #' # Using saved Seurat object in the Data folder
 #' 
-#' TODO: removed the srat object from the data folder, must use the raw data and prepareData function
+#' # TODO: removed the srat object from the data folder, must use the raw data and prepareData function
 #' srat <- readRds(file = "data/pbmc_srat.rds")
 #' expr_matrix <- getExpressionMatrix(srat = srat)
 #' corr_matrix <- getCorrelationMatrix(expression_matrix = expr_matrix)

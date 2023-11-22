@@ -24,7 +24,7 @@ assigning cell type to cluster if applicable
 }
 \examples{
 # Using raw pbmc dataset available with package
-TODO: use system.file
+# TODO: use system.file
 gene_bc_matrix <- file.path('inst/extdata/pbmc/filtered_gene_bc_matrices')
 cell_types <- file.path('inst/extdata/pbmc/cell_types.csv')
 
