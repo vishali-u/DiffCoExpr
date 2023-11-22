@@ -5,21 +5,22 @@
 
 ## Description
 
-The main objective of `DiffCoExpr` is to construct co-expression
-networks from single-cell RNA-sequencing (scRNA-seq) data, and
-subsequently determine if different conditions within an individual
-(e.g. cell type) affect co-expression of genes. We refer to
-co-expression correlation as the correlation between the expression
-level between pairs of genes. `DiffCoExpr` improves the field
-encompassing co-expression analysis by including functions for
-co-expression matrix construction and comparison, and also co-variance
-matrix construction, all in one package. Additionally, this package
-improves co-expression analysis by operating at the single-cell level;
-most existing co-expression analysis tools use bulk-RNA-seq or
-microarray data. As such, most existing packages do not contain any
-functions that can only be applied to single-cell data (e.g.,
-cell-type-specificity analysis). <br> <br> <br> The `DiffCoExpr` package
-was developed using `R version 4.3.0`,
+The main objective of DiffCoExpr is to construct co-expression networks
+from single-cell RNA-sequencing (scRNA-seq) data, and subsequently
+determine if different conditions within an individual (e.g. cell type)
+affect co-expression and co-variance of genes. We refer to co-expression
+correlation as the correlation between the expression level between
+pairs of genes. We refer to co-variance correlation as the correlation
+between gene expression changes across different conditions between
+pairs of genes. `DiffCoExpr` improves the field encompassing
+co-expression analysis by including functions for co-expression matrix
+construction and comparison, and also co-variance matrix construction,
+all in one package. Additionally, this package improves co-expression
+analysis by operating at the single-cell level; most existing
+co-expression analysis tools use bulk-RNA-seq or microarray data. As
+such, most existing packages do not contain any functions that can only
+be applied to single-cell data (e.g., cell-type-specificity analysis).
+<br> The `DiffCoExpr` package was developed using `R version 4.3.0`,
 `Platform: x86_64-apple-darwin20.0/12.2.0 (64-bit)` and
 `Running under: macOS Sonoma 14.1`.
 
@@ -107,16 +108,18 @@ package.
 
 ## References
 
+- Butler A, Hoffman P, Smibert P, Papalexi E, Satija R (2018)
+  Integrating single-cell transcriptomic data across different
+  conditions, technologies, and species. *Nature Biotechnology* 36,
+  411-420. <https://doi.org/10.1038/nbt.4096>
+
+- Butler, A. (2015). Seurat: Tools for Single Cell Genomics R package.
+  <https://cran.r-project.org/web/packages/Seurat>
+
 - Chowdhury H., Bhattacharyya D., Kalita J (2020) (Differential)
   Co-Expression Analysis of Gene Expression: A survey of Best Practices.
   *IEEE/ACM Transactions on Computational Biology and
   Bioinformatics* 17. <https://ieeexplore.ieee.org/document/8613814>
-
-- Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A (2021)
-  GWENA: gene co-expression networks analysis and extended modules
-  characterization in a single Bioconductor package. *BMC
-  Bioinformatics* 22.
-  <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04179-4>
 
 - Contreras-Lopez, Moyano T., Soto D., Gutierrez R (2018) Step-by-Step
   Construction of Gene Co-expression Networks from High-Throughput
@@ -127,6 +130,16 @@ package.
   and display of genome-wide expression patterns. *Biological
   Sciences* 95. <https://www.pnas.org/doi/10.1073/pnas.95.25.14863>
 
+- Hennetin J., Pehkonen P., Bellis M (2009) Construction and use of gene
+  expression covariation matrix. *BMC Bioinformatics* 10.
+  <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-214>
+
+- Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A (2021)
+  GWENA: gene co-expression networks analysis and extended modules
+  characterization in a single Bioconductor package. *BMC
+  Bioinformatics* 22.
+  <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04179-4>
+
 - R Core Team (2023). R: A language and environment for statistical
   computing. R Foundation for Statistical Computing, Vienna, Austria.
   <https://www.R-project.org/>
@@ -135,18 +148,6 @@ package.
   Cell-type-specific co-expression inference from single cell
   RNA-sequencing data. *Nature Communications* 14.
   <https://www.nature.com/articles/s41467-023-40503-7>
-
-- Hennetin J., Pehkonen P., Bellis M (2009) Construction and use of gene
-  expression covariation matrix. *BMC Bioinformatics* 10.
-  <https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-10-214>
-
-- Butler A, Hoffman P, Smibert P, Papalexi E, Satija R (2018)
-  Integrating single-cell transcriptomic data across different
-  conditions, technologies, and species. *Nature Biotechnology* 36,
-  411-420. <https://doi.org/10.1038/nbt.4096>
-
-- Butler, A. (2015). Seurat: Tools for Single Cell Genomics R package.
-  <https://cran.r-project.org/web/packages/Seurat>
 
 - Wickham, H. and Bryan, J. (2019). *R Packages* (2nd edition). Newton,
   Massachusetts: O’Reilly Media. <https://r-pkgs.org/>
