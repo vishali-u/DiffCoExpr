@@ -44,6 +44,18 @@ prepareData <- function(geneMatrixPath,
     stop("The gene matrices path you have provided does not exist.")
   }
   
+  if (is.null(cellTypesPath)) {
+    warning("You have not provided a file mapping cell type markers to cell
+             types. Cell types will not be added, and cluster names c0, c1,..., 
+             will be used instead.")
+  }
+  
+  if (!is.null(cellTypesPath) && !file.exists(cellTypesPath)) {
+    stop("You have tried to provide a file mapping cell type markers to cell 
+          types. However, the file does not exist. Please re-run with the a
+          valid file path or without adding a file path.")
+  }
+  
   # Check if the needed files are in the provided directory
   # Note: depending on which version of cellranger was used, there output will 
   # have either barcodes.tsv or features.tsv
@@ -155,8 +167,3 @@ prepareData <- function(geneMatrixPath,
   
   return(srat)
 }
-
-
-
-
-
