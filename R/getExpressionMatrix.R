@@ -1,23 +1,32 @@
-#' Create (and visualize) the expression matrix for single-cell RNA-seq data
+#' Create an expression matrix for single-cell RNA-seq data. Each row is a 
+#' gene and each column is a cell.
 #' 
-#' @param srat A Seurat object containing normalized counts from a scRNA_seq
+#' @param srat A Seurat object containing normalized counts from a scRNA-seq
 #'    experiment.
-#' @param cell_type A cell type that should be used to filter the expression
-#'    matrix so all cells are of that cell type. Can also be a cluster if
-#'    cell types were not used. Assumes cell type/cluster are in the Seurat
-#'    object. Default is set to NULL, so all cells of all types are included
-#'    in the expression matrix
+#' @param cellType A cell type that should be used to filter the expression
+#'    matrix so all cells are of that cell type. Can also be a default cluster 
+#'    name (e.g. c0, c1,...) if cell types were not used. Default is set to 
+#'    NULL, so all cells of all types are included in the expression matrix.
 #' 
 #' @return A dense matrix where the rows are genes and the columns are cell
 #'    barcodes. Each cell contains the log normalized counts of that gene in
-#'    that cell
+#'    that cell.
 #' 
 #' @examples
-#' # Using saved Seurat object in the Data folder
-#' # TODO: removed the srat object from the data folder, must use the raw data and prepareData function
-#' srat <- readRds(file = "data/pbmc_srat.rds")
-#' expr_matrix <- get_expression_matrix(srat = srat)
-#' expr_matrix
+#' # Using pbmc dataset available with package
+#' geneMatrixPath <- system.file("extdata",
+#'                               "filtered_gene_bc_matrices",
+#'                                package =  "DiffCoExpr")
+#' cellTypes <- system.file("extdata", 
+#'                          "cell_types.csv", 
+#'                           package = "DiffCoExpr")
+#' 
+#' pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
+#'                     cellTypesPath = cellTypes)
+#'                     
+#' exprMatrix <- getExpressionMatrix(srat = pbmc, 
+#'                                   cellType = "Platelet")
+#' exprMatrix
 #' 
 #' @references 
 #' Butler, A. (2015). Seurat: Tools for Single Cell Genomics
@@ -26,31 +35,41 @@
 #' 
 #' @export
 #' @import Seurat
-#' @import ComplexHeatmap
 getExpressionMatrix <- function(srat, 
-                                cell_type = NULL) {
+                                cellType = NULL) {
+  
+  if (! inherits(srat, "Seurat")) {
+    stop("The input you provided for srat is not a Seurat object. You must pass 
+         a seurat object containing normalized scRNA counts data.")
+  }
+  
+  if (! is.null(cellType) && !(cellType %in% levels(Idents(srat)))) {
+    stop("The cell type you provided is not a valid cell type in the Seurat
+         object you provided. Re-run with a valid cell type or no cell type.")
+  }
   
   # Get a matrix of normalized values from the Seurat object
-  data_matrix <- as.matrix(Seurat::GetAssayData(srat, 
-                                                assay = "RNA", 
-                                                slot = "data"))
+  dataMatrix <- as.matrix(Seurat::GetAssayData(srat,
+                                               assay = "RNA", 
+                                               slot = "data"))
   
   # Only use the variable features
-  variable_genes <- intersect(row.names(data_matrix), 
+  variableGenes <- intersect(row.names(dataMatrix), 
                               Seurat::VariableFeatures(srat))
   
   # Extract the expression matrix for the selected genes
-  expression_matrix <- data_matrix[variable_genes, ]
+  expressionMatrix <- dataMatrix[variableGenes, ]
   
   # Filter by a cell type if applicable
-  if (! is.null(cell_type)) {
-    cells_to_keep <- Seurat::WhichCells(srat, 
-                                        ident = cell_type)
-    expression_matrix <- expression_matrix[, colnames(expression_matrix) %in% cells_to_keep]
+  if (! is.null(cellType)) {
+    cellsToKeep <- Seurat::WhichCells(srat,
+                                      ident = cellType)
+    expressionMatrix <- expressionMatrix[, colnames(expressionMatrix) %in% 
+                                           cellsToKeep]
     
   }
   
-  return(expression_matrix)
+  return(expressionMatrix)
   
 }
 
