@@ -12,12 +12,12 @@ affect co-expression of genes. We refer to co-expression correlation as
 the correlation between the expression level between pairs of genes.
 `DiffCoExpr` improves the field encompassing co-expression analysis by
 including functions for co-expression matrix construction and
-comparison, and also co-variance matrix construction, all in one
-package. Additionally, this package improves co-expression analysis by
-operating at the single-cell level; most existing co-expression analysis
-tools use bulk-RNA-seq or microarray data. As such, most existing
-packages do not contain any functions that can only be applied to
-single-cell data (e.g., cell-type-specificity analysis).
+comparison, all in one package. Additionally, this package improves
+co-expression analysis by operating at the single-cell level; most
+existing co-expression analysis tools use bulk-RNA-seq or microarray
+data. As such, most existing packages do not contain any functions that
+can only be applied to single-cell data (e.g., cell-type-specificity
+analysis).
 
 The `DiffCoExpr` package was developed using `R version 4.3.0`,
 `Platform: x86_64-apple-darwin20.0/12.2.0 (64-bit)` and
