@@ -1,8 +1,10 @@
 #' Prepare the scRNA-seq data for analysis by normalizing, clustering, and
-#' assigning cell type to cluster if applicable 
+#' assigning cell type to cluster if applicable
 #'
-#' @param geneMatrixPath A path to filtered gene barcode matrices produced
-#'    using the cellranger pipeline.
+#' @param geneMatrixPath A path to the directory containing filtered gene 
+#'    barcode matrices produced using the cellranger pipeline (as a reminder, 
+#'    cellranger will produce a directory containing 3 files: matrix.mtx, 
+#'    genes.tsv/features.tsv, and barcodes.tsv)
 #' @param cellTypesPath A path to a csv file that maps marker genes to cell 
 #'    type; default value is NULL (the clusters are not assigned a cell type).
 #'    
@@ -11,8 +13,12 @@
 #' 
 #' @examples
 #' # Using pbmc dataset available with package
-#' geneMatrixPath <- system.file('extdata/pbmc/filtered_gene_bc_matrices')
-#' cellTypes <- system.file('extdata/pbmc/cell_types.csv')
+#' geneMatrixPath <- system.file("extdata",
+#'                               "filtered_gene_bc_matrices",
+#'                                package =  "DiffCoExpr")
+#' cellTypes <- system.file("extdata", 
+#'                          "cell_types.csv", 
+#'                           package = "DiffCoExpr")
 #' 
 #' pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
 #'                     cellTypesPath = cellTypes)
@@ -33,6 +39,29 @@
 #' 
 prepareData <- function(geneMatrixPath, 
                          cellTypesPath=NULL) {
+  
+  if (!dir.exists(geneMatrixPath)) {
+    stop("The gene matrices path you have provided does not exist.")
+  }
+  
+  # Check if the needed files are in the provided directory
+  # Note: depending on which version of cellranger was used, there output will 
+  # have either barcodes.tsv or features.tsv
+  matrixPath <- file.path(geneMatrixPath, "matrix.mtx")
+  genesFile <- file.path(geneMatrixPath, "genes.tsv")
+  barcodesFile <- file.path(geneMatrixPath, "barcodes.tsv")
+  featuresFile <- file.path(geneMatrixPath, "features.tsv")
+  
+  matrixExists <- file.exists(matrixPath)
+  genesExists <- file.exists(genesFile)
+  barcodesOrFeaturesExists <- file.exists(barcodesFile) || 
+    file.exists(featuresFile)
+  
+  if (!(matrixExists && genesExists && barcodesOrFeaturesExists)) {
+    stop("At least one of the needed matrices is missing. Ensure the directory
+         you provide contains matrix.mtx, genes.tsv, and either barcodes.tsv
+         or features.tsv.")
+  }
   
   # Load the data and store the non-normalized counts in a Seurat object
   srat.data <- Seurat::Read10X(data.dir = geneMatrixPath)
