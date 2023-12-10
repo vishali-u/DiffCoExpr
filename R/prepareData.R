@@ -1,22 +1,21 @@
 #' Prepare the scRNA-seq data for analysis by normalizing, clustering, and
 #' assigning cell type to cluster if applicable 
 #'
-#' @param gene_bc_matrix_path A path to filtered gene barcode matrices produced
+#' @param geneMatrixPath A path to filtered gene barcode matrices produced
 #'    using the cellranger pipeline.
-#' @param cell_types_path A path to a csv file that maps marker genes to cell 
+#' @param cellTypesPath A path to a csv file that maps marker genes to cell 
 #'    type; default value is NULL (the clusters are not assigned a cell type).
 #'    
 #' @return Returns an object of class SeuratObject that stores the data for
 #'    a single cell RNA-seq experiment
 #' 
 #' @examples
-#' # Using raw pbmc dataset available with package
-#' # TODO: use system.file
-#' gene_bc_matrix <- file.path('inst/extdata/pbmc/filtered_gene_bc_matrices')
-#' cell_types <- file.path('inst/extdata/pbmc/cell_types.csv')
+#' # Using pbmc dataset available with package
+#' geneMatrixPath <- system.file('extdata/pbmc/filtered_gene_bc_matrices')
+#' cellTypes <- system.file('extdata/pbmc/cell_types.csv')
 #' 
-#' pbmc <- prepare_data(gene_bc_matrix_path = gene_bc_matrix,
-#'                      cell_types_path = cell_types)
+#' pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
+#'                     cellTypesPath = cellTypes)
 #' pbmc
 #' 
 #' @references
@@ -31,13 +30,12 @@
 #' 
 #' @export
 #' @import Seurat
-#' @import scCustomize
 #' 
-prepareData <- function(gene_bc_matrix_path, 
-                         cell_types_path=NULL) {
+prepareData <- function(geneMatrixPath, 
+                         cellTypesPath=NULL) {
   
   # Load the data and store the non-normalized counts in a Seurat object
-  srat.data <- Seurat::Read10X(data.dir = gene_bc_matrix_path)
+  srat.data <- Seurat::Read10X(data.dir = geneMatrixPath)
   srat <- Seurat::CreateSeuratObject(counts = srat.data,
                                      min.cells = 3,
                                      min.features = 200)
@@ -72,45 +70,45 @@ prepareData <- function(gene_bc_matrix_path,
   # Perform non-linear dimensional reduction
   srat <- Seurat::RunUMAP(srat, dims = 1:10)
   
-  # If cell_types is NULL, we can return here (the cell types will not be
+  # If cellTypesPath is NULL, we can return here (the cell types will not be
   # annotated and downstream analyses will be done based on cluster)
-  if (is.null(cell_types_path)) {
+  if (is.null(cellTypesPath)) {
     return(srat)
   }
   
   # Find all marker genes for each cluster (to annotate with cell identity)
   srat.markers <- Seurat::FindAllMarkers(srat, only.pos = TRUE)
   
-  # Read in the cell_types file and store data in a list
-  original_cell_types <- read.csv(file = cell_types_path)
-  cell_types <- strsplit(as.character(original_cell_types$Markers), ",\\s*")
-  names(cell_types) <- original_cell_types$Cell.Type
+  # Read in the cellTypes file and store data in a list
+  originalCellTypes <- read.csv(file = cellTypesPath)
+  cellTypes <- strsplit(as.character(originalCellTypes$Markers), ",\\s*")
+  names(cellTypes) <- originalCellTypes$Cell.Type
   
   # Create a data frame mapping cluster ID to a comma separated string of all
   # marker genes in that string
-  markers_subset <- srat.markers[, c("cluster", "gene")]
-  cluster_to_gene <- aggregate(gene ~ cluster, 
-                               data = markers_subset, 
-                               FUN = function(x) { list(x) })
+  markersSubset <- srat.markers[, c("cluster", "gene")]
+  clusterToGene <- aggregate(gene ~ cluster,
+                             data = markersSubset, 
+                             FUN = function(x) { list(x) })
   
   # Initialize values to store cell identities in the cluster data frame
-  cluster_to_gene$cell_identity <- NA
-  num_cell_types <- length(cell_types)
-  num_clusters <- nrow(cluster_to_gene)
+  clusterToGene$cellIdentity <- NA
+  numCellTypes <- length(cellTypes)
+  numClusters <- nrow(clusterToGene)
   
   # Iterate over each cluster
-  for (i in seq_len(num_clusters)) {
-    curr_cluster_genes <- cluster_to_gene$gene[[i]]
+  for (i in seq_len(numClusters)) {
+    currClusterGenes <- clusterToGene$gene[[i]]
     
     # Iterate over each cell type
-    for (j in seq_len(num_cell_types)) {
-      curr_type <- names(cell_types)[j]
-      curr_markers <- cell_types[[j]]
+    for (j in seq_len(numCellTypes)) {
+      currType <- names(cellTypes)[j]
+      currMarkers <- cellTypes[[j]]
       
       # Check if all markers for current cell type are in the cluster's genes
       # Assign the cell type if all markers are present
-      if (all(curr_markers %in% curr_cluster_genes)) {
-        cluster_to_gene$cell_identity[j] <- curr_type
+      if (all(currMarkers %in% currClusterGenes)) {
+        clusterToGene$cellIdentity[j] <- currType
         # Stop checking after the first match, assuming one identity per cluster
         break 
       }
@@ -118,17 +116,13 @@ prepareData <- function(gene_bc_matrix_path,
   }
   
   # Make sure the data frame is ordered from smallest to largest cluster number
-  cluster_to_gene <- cluster_to_gene[order(cluster_to_gene$cluster), ]
+  clusterToGene <- clusterToGene[order(clusterToGene$cluster), ]
   
   # Rename the identies to the cell types in the Seurat object
-  new_cluster_ids <- cluster_to_gene$cell_identity
-  names(new_cluster_ids) <- levels(srat)
+  newClusterIds <- clusterToGene$cellIdentity
+  names(newClusterIds) <- levels(srat)
   srat <- Seurat::RenameIdents(srat, 
-                               new_cluster_ids)
-  # TODO: rename the clusters maybe
-  # srat <- scCustomize::Rename_Clusters(srat, 
-  #                                      new_cluster_ids,
-  #                                      meta_col_name = "Original Clusters")
+                               newClusterIds)
   
   return(srat)
 }
