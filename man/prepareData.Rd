@@ -5,13 +5,15 @@
 \title{Prepare the scRNA-seq data for analysis by normalizing, clustering, and
 assigning cell type to cluster if applicable}
 \usage{
-prepareData(gene_bc_matrix_path, cell_types_path = NULL)
+prepareData(geneMatrixPath, cellTypesPath = NULL)
 }
 \arguments{
-\item{gene_bc_matrix_path}{A path to filtered gene barcode matrices produced
-using the cellranger pipeline.}
+\item{geneMatrixPath}{A path to the directory containing filtered gene
+barcode matrices produced using the cellranger pipeline (as a reminder,
+cellranger will produce a directory containing 3 files: matrix.mtx,
+genes.tsv/features.tsv, and barcodes.tsv)}
 
-\item{cell_types_path}{A path to a csv file that maps marker genes to cell
+\item{cellTypesPath}{A path to a csv file that maps marker genes to cell
 type; default value is NULL (the clusters are not assigned a cell type).}
 }
 \value{
@@ -23,13 +25,16 @@ Prepare the scRNA-seq data for analysis by normalizing, clustering, and
 assigning cell type to cluster if applicable
 }
 \examples{
-# Using raw pbmc dataset available with package
-# TODO: use system.file
-gene_bc_matrix <- file.path('inst/extdata/pbmc/filtered_gene_bc_matrices')
-cell_types <- file.path('inst/extdata/pbmc/cell_types.csv')
+# Using pbmc dataset available with package
+geneMatrixPath <- system.file("extdata",
+                              "filtered_gene_bc_matrices",
+                               package =  "DiffCoExpr")
+cellTypes <- system.file("extdata", 
+                         "cellTypes.csv", 
+                          package = "DiffCoExpr")
 
-pbmc <- prepare_data(gene_bc_matrix_path = gene_bc_matrix,
-                     cell_types_path = cell_types)
+pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
+                    cellTypesPath = cellTypes)
 pbmc
 
 }

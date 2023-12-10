@@ -2,31 +2,49 @@
 % Please edit documentation in R/getCorrelationMatrix.R
 \name{getCorrelationMatrix}
 \alias{getCorrelationMatrix}
-\title{Create (and visualize) the correlation between every pair of genes in the
-expression matrix}
+\title{Create a correlation matrix. Lowly expressed genes, and genes will too
+little variation across cells are filtered out. In the matrix, each
+row and column are genes, and each cell contains the correlation between the
+pair of genes.}
 \usage{
-getCorrelationMatrix(expression_matrix)
+getCorrelationMatrix(expressionMatrix, minCellCount = 5, minGeneCount = 5)
 }
 \arguments{
-\item{expression_matrix}{A matrix containing the expression levels of genes
+\item{expressionMatrix}{A matrix containing the expression levels of genes
 per cell. The rows are genes and the columns are cells}
+
+\item{minCellCount}{A minimum number of cells that should still be present
+in the data after filtering. If the number of cells after filtering is
+less than this value, stop running. The default is set to 5.}
+
+\item{minGeneCount}{A minimum number of genes that should still be present
+in the data after filtering. If the number of genes after filtering is
+less than this value, stop running. The default is set to 5.}
 }
 \value{
 A matrix where the rows and columns are genes, and the cell contains
 the correlation between the two genes
 }
 \description{
-Create (and visualize) the correlation between every pair of genes in the
-expression matrix
+Create a correlation matrix. Lowly expressed genes, and genes will too
+little variation across cells are filtered out. In the matrix, each
+row and column are genes, and each cell contains the correlation between the
+pair of genes.
 }
 \examples{
-# Using saved Seurat object in the Data folder
+# Using an example expression matrix that was generated using the pbmc data
+# that is available in this package. This matrix only includes platelet
+# cells.
+exprMatrixPath <- system.file("extdata", 
+                              "expressionMatrix.csv", 
+                               package = "DiffCoExpr")
+exprMatrix <- read.csv(exprMatrixPath)
+# Set the row names and remove the column containing gene names
+rownames(exprMatrix) <- exprMatrix[, 1]
+exprMatrix <- exprMatrix[, -1]
 
-# TODO: removed the srat object from the data folder, must use the raw data and prepareData function
-srat <- readRds(file = "data/pbmc_srat.rds")
-expr_matrix <- getExpressionMatrix(srat = srat)
-corr_matrix <- getCorrelationMatrix(expression_matrix = expr_matrix)
-corr_matrix
+corrMatrix <- getCorrelationMatrix(expressionMatrix = exprMatrix)
+corrMatrix
 
 }
 \references{

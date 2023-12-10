@@ -1,20 +1,43 @@
-#' Create (and visualize) the correlation between every pair of genes in the
-#' expression matrix
+#' Create a correlation matrix. Lowly expressed genes, and genes will too 
+#' little variation across cells are filtered out. In the matrix, each
+#' row and column are genes, and each cell contains the correlation between the
+#' pair of genes. 
 #' 
-#' @param expression_matrix A matrix containing the expression levels of genes
+#' @param expressionMatrix A matrix containing the expression levels of genes
 #'    per cell. The rows are genes and the columns are cells
+#'    
+#' @param minCellCount A minimum number of cells that should still be present
+#'    in the data after filtering. If the number of cells after filtering is
+#'    less than this value, stop running. The default is set to 5. This value
+#'    must be greater than 2
+#'
+#' @param minGeneCount A minimum number of genes that should still be present
+#'    in the data after filtering. If the number of genes after filtering is
+#'    less than this value, stop running. The default is set to 5. This value
+#'    must be greater than 2.
+#'    
+#' @param minPt A miminum percent to filter out genes. Any genes that have a
+#'    variation that is less than the variation at minPt percentile will be
+#'    removed. Value must be be greater than 0 and less than or equal to 1.
+#'    Default is 0.20
 #'    
 #' @return A matrix where the rows and columns are genes, and the cell contains
 #'    the correlation between the two genes
 #'    
 #' @examples
-#' # Using saved Seurat object in the Data folder
+#' # Using an example expression matrix that was generated using the pbmc data
+#' # that is available in this package. This matrix only includes platelet
+#' # cells.
+#' exprMatrixPath <- system.file("extdata", 
+#'                               "expressionMatrix.csv", 
+#'                                package = "DiffCoExpr")
+#' exprMatrix <- read.csv(exprMatrixPath)
+#' # Set the row names and remove the column containing gene names
+#' rownames(exprMatrix) <- exprMatrix[, 1]
+#' exprMatrix <- exprMatrix[, -1]
 #' 
-#' # TODO: removed the srat object from the data folder, must use the raw data and prepareData function
-#' srat <- readRds(file = "data/pbmc_srat.rds")
-#' expr_matrix <- getExpressionMatrix(srat = srat)
-#' corr_matrix <- getCorrelationMatrix(expression_matrix = expr_matrix)
-#' corr_matrix
+#' corrMatrix <- getCorrelationMatrix(expressionMatrix = exprMatrix)
+#' corrMatrix
 #' 
 #' @references
 #' Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A. (2021) GWENA: 
@@ -23,57 +46,73 @@
 #' \href{https://doi.org/10.1186/s12859-021-04179-4}{Link}.
 #' 
 #' @export
-#' @importFrom dplyr top_frac
-#' @import ComplexHeatmap
-getCorrelationMatrix <- function(expression_matrix) {
+getCorrelationMatrix <- function(expressionMatrix, 
+                                 minCellCount = 5,
+                                 minGeneCount = 5,
+                                 minPt = 0.20) {
+  
+  if (! is.matrix(expressionMatrix) && ! is.data.frame(expressionMatrix)) {
+    stop("Please provide a matrix or data.frame object for the 
+         expressionMatrix.")
+  }
+  
+  # Need at least 2 cells and 2 genes to get the correlation matrix
+  if ((nrow(expressionMatrix) < 2) || (ncol(expressionMatrix) < 2)) {
+    stop("There are fewer than 2 cells or fewer than 2 genes in this dataset.
+         There is not enough data to get a correlation matrix")
+  }
+  
+  # Convert the expression matrix into a data frame if it is not a data frame
+  # to do some calculations on the data
+  if (is.matrix(expressionMatrix)) {
+    expressionMatrix <- as.data.frame(expressionMatrix)
+  }
+  
+  if (! all(sapply(expressionMatrix, is.numeric))) {
+    stop("Some of the values in the matrix you provided are not numeric. Remove
+         non-numeric values.")
+  }
   
   # Filter out genes with zero variation
-  # Calculate standard deviation for each gene
-  gene_sd <- apply(expression_matrix, 1, sd)
+  # Calculate standard deviation for each gene and filter out genes with 0
+  # standard variation
+  geneSD <- apply(expressionMatrix, 1, sd)
+  geneSD <- geneSD[geneSD > 0]
+  expressionMatrix <- expressionMatrix[names(geneSD), ]
   
-  # Filter out genes with zero standard deviation
-  expression_matrix <- expression_matrix[gene_sd > 0, ]
+  # Create a table mapping genes to their standard deviation (sorted by sd)
+  geneVariationTable <- data.frame(gene = names(geneSD), 
+                                   geneSD = geneSD[geneSD > 0])
+  geneVariationTable <- geneVariationTable[order(geneVariationTable$geneSD, 
+                                                 decreasing = TRUE), ]
   
   # Filter out genes with low variation (out of the genes that have some
-  # variation) by keeping the top 80% of genes based on variation
-  # Convert matrix to data frame
-  expression_matrix <- as.data.frame(expression_matrix)
+  # variation) by keeping the filtering out the lower 20 % of genes based on
+  # variation
+  if (minPt < 0 || minPt > 1) {
+    warning("The minPt value you provided is outside (0,1]. Using the default
+            minPt of 0.20 instead.")
+    minPt = 0.20
+  }
+  cutoffValue <- quantile(geneVariationTable$geneSD, minPt)[[1]]
   
-  # Calculate the median expression for each gene
-  variation <- lapply(expression_matrix, 
-                      function(row) do.call(median, list(row)))
-  
-  top_pct_df <- data.frame(gene = names(variation), 
-                           variation = unlist(variation), 
-                           stringsAsFactors = FALSE)
-  top_80 <- dplyr::top_frac(top_pct_df, 0.8, variation)
-  expression_matrix <- expression_matrix[, top_80$gene]
-  
-  # Convert data frame back to matrix
-  expression_matrix <- as.matrix(expression_matrix)
-  
-  # TODO: figure out how to build matrix without filtering outliers since
-  # many rows could get filtered if data is noisy but if it does not work
-  # maybe try filtering out genes that have a large proportion (maybe > 50 %)
-  # of extreme expression levels
-  # First filter out any outliers using z-scores
-  z_scores <- scale(expression_matrix)
-  # Check each row for extreme z scores and remove them
-  extreme_rows <- apply(z_scores, 
-                        1, 
-                        function(row) any(row > 3 | row < -3))
-  expression_matrix <- expression_matrix[!extreme_rows, ]
+  # Filter out genes below the cutoff
+  topGenes <- geneVariationTable[geneVariationTable$geneSD > cutoffValue, ]
+  expressionMatrix <- expressionMatrix[topGenes$gene,]
 
-  # if too many rows got filtered out and there are less than 10 cells and 10
+  # Convert data frame back to matrix
+  expressionMatrix <- as.matrix(expressionMatrix)
+  
+  # if too many rows got filtered out and there are less than 5 cells and 5
   # genes, stop running
-  if (nrow(expression_matrix) < 10 || ncol(expression_matrix) < 10) {
-    stop("After filtering, there is not enough data.")
+  if (nrow(expressionMatrix) < minCellCount || 
+      ncol(expressionMatrix) < minGeneCount) {
+    stop("After filtering, there are fewer than 5 cells and/or 5 genes. This
+         is not enough data for further analysis.")
   }
   
   # Compute the correlation matrix (for Pearson correlation)
-  correlation_matrix <- cor(t(expression_matrix), method = "pearson")
-
-  return(correlation_matrix)
+  correlationMatrix <- cor(t(expressionMatrix), method = "pearson")
+  
+  return(correlationMatrix)
 }
-
-

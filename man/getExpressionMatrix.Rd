@@ -2,34 +2,48 @@
 % Please edit documentation in R/getExpressionMatrix.R
 \name{getExpressionMatrix}
 \alias{getExpressionMatrix}
-\title{Create (and visualize) the expression matrix for single-cell RNA-seq data}
+\title{Create an expression matrix for single-cell RNA-seq data. Each row is a
+gene and each column is a cell.}
 \usage{
-getExpressionMatrix(srat, cell_type = NULL)
+getExpressionMatrix(srat, cellType = NULL, minCellCount = 5)
 }
 \arguments{
-\item{srat}{A Seurat object containing normalized counts from a scRNA_seq
+\item{srat}{A Seurat object containing normalized counts from a scRNA-seq
 experiment.}
 
-\item{cell_type}{A cell type that should be used to filter the expression
-matrix so all cells are of that cell type. Can also be a cluster if
-cell types were not used. Assumes cell type/cluster are in the Seurat
-object. Default is set to NULL, so all cells of all types are included
-in the expression matrix}
+\item{cellType}{A cell type that should be used to filter the expression
+matrix so all cells are of that cell type. Can also be a default cluster
+name (e.g. c0, c1,...) if cell types were not used. Default is set to
+NULL, so all cells of all types are included in the expression matrix.}
+
+\item{minCellCount}{A minimum number of cells that should still be present
+in the data after filtering. If the number of cells is less than this
+value, stop running. Default is set to 5.}
 }
 \value{
 A dense matrix where the rows are genes and the columns are cell
 barcodes. Each cell contains the log normalized counts of that gene in
-that cell
+that cell.
 }
 \description{
-Create (and visualize) the expression matrix for single-cell RNA-seq data
+Create an expression matrix for single-cell RNA-seq data. Each row is a
+gene and each column is a cell.
 }
 \examples{
-# Using saved Seurat object in the Data folder
-# TODO: removed the srat object from the data folder, must use the raw data and prepareData function
-srat <- readRds(file = "data/pbmc_srat.rds")
-expr_matrix <- get_expression_matrix(srat = srat)
-expr_matrix
+# Using pbmc dataset available with package
+geneMatrixPath <- system.file("extdata",
+                              "filtered_gene_bc_matrices",
+                               package =  "DiffCoExpr")
+cellTypes <- system.file("extdata", 
+                         "cellTypes.csv", 
+                          package = "DiffCoExpr")
+
+pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
+                    cellTypesPath = cellTypes)
+                    
+exprMatrix <- getExpressionMatrix(srat = pbmc, 
+                                  cellType = "Platelet")
+exprMatrix
 
 }
 \references{

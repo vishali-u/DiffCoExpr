@@ -5,6 +5,7 @@
 #'    barcode matrices produced using the cellranger pipeline (as a reminder, 
 #'    cellranger will produce a directory containing 3 files: matrix.mtx, 
 #'    genes.tsv/features.tsv, and barcodes.tsv)
+#'    
 #' @param cellTypesPath A path to a csv file that maps marker genes to cell 
 #'    type; default value is NULL (the clusters are not assigned a cell type).
 #'    
@@ -17,7 +18,7 @@
 #'                               "filtered_gene_bc_matrices",
 #'                                package =  "DiffCoExpr")
 #' cellTypes <- system.file("extdata", 
-#'                          "cell_types.csv", 
+#'                          "cellTypes.csv", 
 #'                           package = "DiffCoExpr")
 #' 
 #' pbmc <- prepareData(geneMatrixPath = geneMatrixPath,

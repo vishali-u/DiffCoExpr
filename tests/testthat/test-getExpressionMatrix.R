@@ -6,7 +6,7 @@ srat <- prepareData(
                                "filtered_gene_bc_matrices",
                                package =  "DiffCoExpr"),
   cellTypesPath = system.file("extdata",
-                              "cell_types.csv",
+                              "cellTypes.csv",
                               package =  "DiffCoExpr")
 )
 
