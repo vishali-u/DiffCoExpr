@@ -21,10 +21,10 @@ test_that("Input that will not throw errors", {
   )
   
   # Check that the correlation matrix is a square matrix
-  expect_identical(dim(corrMatrix)[1], dim(corrMatrix)[2])
+  expect_identical(nrow(corrMatrix), ncol(corrMatrix)[2])
   
   # Check that genes were filtered out
-  expect_lt(dim(filteredExprMatrix)[1], dim(corrMatrix)[1])
+  expect_lt(nrow(filteredExprMatrix), nrow(corrMatrix))
   
   expect_warning(getCorrelationMatrix(expressionMatrix = filteredExprMatrix,
                                       minPt = 1.5))
@@ -60,6 +60,4 @@ test_that("Input that will throw errors", {
   rownames(smallTestMatrix) <- geneNames
   colnames(smallTestMatrix) <- cellBarcodes
   expect_error(getCorrelationMatrix(expressionMatrix = smallTestMatrix))
-  
 })
-

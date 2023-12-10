@@ -29,7 +29,7 @@
 #' # that is available in this package. This matrix only includes platelet
 #' # cells.
 #' exprMatrixPath <- system.file("extdata", 
-#'                               "expressionMatrix.csv", 
+#'                               "expressionMatrixPlatelet.csv", 
 #'                                package = "DiffCoExpr")
 #' exprMatrix <- read.csv(exprMatrixPath)
 #' # Set the row names and remove the column containing gene names
@@ -46,6 +46,7 @@
 #' \href{https://doi.org/10.1186/s12859-021-04179-4}{Link}.
 #' 
 #' @export
+#' @import dplyr
 getCorrelationMatrix <- function(expressionMatrix, 
                                  minCellCount = 5,
                                  minGeneCount = 5,
@@ -60,6 +61,13 @@ getCorrelationMatrix <- function(expressionMatrix,
   if ((nrow(expressionMatrix) < 2) || (ncol(expressionMatrix) < 2)) {
     stop("There are fewer than 2 cells or fewer than 2 genes in this dataset.
          There is not enough data to get a correlation matrix")
+  }
+  
+  # Check that minPt is in the correct range
+  if (minPt < 0 || minPt > 1) {
+    warning("The minPt value you provided is outside (0,1]. Using the default
+            minPt of 0.20 instead.")
+    minPt = 0.20
   }
   
   # Convert the expression matrix into a data frame if it is not a data frame
@@ -81,25 +89,21 @@ getCorrelationMatrix <- function(expressionMatrix,
   expressionMatrix <- expressionMatrix[names(geneSD), ]
   
   # Create a table mapping genes to their standard deviation (sorted by sd)
-  geneVariationTable <- data.frame(gene = names(geneSD), 
-                                   geneSD = geneSD[geneSD > 0])
-  geneVariationTable <- geneVariationTable[order(geneVariationTable$geneSD, 
-                                                 decreasing = TRUE), ]
+  geneVariationTable <- dplyr::tibble(gene = names(geneSD), 
+                                      geneSD = geneSD) %>%
+    dplyr::arrange(desc(geneSD))
   
   # Filter out genes with low variation (out of the genes that have some
   # variation) by keeping the filtering out the lower 20 % of genes based on
   # variation
-  if (minPt < 0 || minPt > 1) {
-    warning("The minPt value you provided is outside (0,1]. Using the default
-            minPt of 0.20 instead.")
-    minPt = 0.20
-  }
-  cutoffValue <- quantile(geneVariationTable$geneSD, minPt)[[1]]
+  cutoffValue <- quantile(geneVariationTable$geneSD, minPt)
   
   # Filter out genes below the cutoff
-  topGenes <- geneVariationTable[geneVariationTable$geneSD > cutoffValue, ]
-  expressionMatrix <- expressionMatrix[topGenes$gene,]
-
+  topGenes <- geneVariationTable %>% 
+    dplyr::filter(geneSD > cutoffValue) %>% 
+    dplyr::pull(gene)
+  expressionMatrix <- expressionMatrix[topGenes,]
+  
   # Convert data frame back to matrix
   expressionMatrix <- as.matrix(expressionMatrix)
   
