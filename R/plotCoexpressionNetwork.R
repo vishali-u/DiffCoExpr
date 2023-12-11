@@ -2,7 +2,7 @@
 #' genes are co-expressed, there will be an edge connecting them. If separate
 #' communities/clusters of co-expressed genes are detected, each community
 #' will be a different color. If there is not enough data to detect communities
-#' accurately, communities will not be included, and instead the top 100
+#' accurately, communities will not be included, and instead the top 1000 
 #' genes (sorted by correlation) will be plotted. 
 #' 
 #' @param edgeList A list of all the genes that should have an edge between
@@ -52,7 +52,7 @@ plotCoexpressionNetwork <- function(edgeList) {
             labelled.")
     
     # Select the top 1000 genes by correlation if there are more than 1000
-    if (nrows(edgeList) > 1000) {
+    if (nrow(edgeList) > 1000) {
       topGenes <- edgeList %>%
         dplyr::arrange(desc(Correlation)) %>%
         dplyr::slice_head(n = 1000)
@@ -61,7 +61,8 @@ plotCoexpressionNetwork <- function(edgeList) {
       networkGraph <- igraph::graph_from_data_frame(topGenes, 
                                                     directed = FALSE)
     } 
-
+    
+    par(mar = c(0,0,0,0))
     plotGraph <- plot(networkGraph,
                       vertex.label = igraph::V(networkGraph)$name,
                       vertex.label.cex = 0.25,
@@ -70,27 +71,28 @@ plotCoexpressionNetwork <- function(edgeList) {
                       vertex.color = "lightblue",
                       vertex.size = 3,
                       edge.color = adjustcolor("grey", alpha.f = 0.3))
-
+    
   } else {
     message(sprintf("There were %s communities detected.", length(communities)))
     
-    # Create a simplified graph where each community is represented by a single
-    # node where the size of the node is proportional to the number of genes 
-    # in the community
-    communitySizes <- table(communities$membership)
-    simplifiedGraph <- igraph::make_empty_graph(n = length(communitySizes))
-    igraph::V(simplifiedGraph)$size <- communitySizes / 3
-    igraph::V(simplifiedGraph)$name <- names(communitySizes)
-    igraph::V(simplifiedGraph)$color <- rainbow(length(communitySizes))
+    # Assign a color to each community
+    communityColors <- rainbow(length(communities))
+    vertexColor <- communityColors[communities$membership]
     
-    # Now plot the simplified graph
-    plotGraph <- plot(simplifiedGraph,
-                      vertex.label = igraph::V(simplifiedGraph)$name,
-                      vertex.label.cex = 0.8,
-                      vertex.label.color = "black",
-                      vertex.size = igraph::V(simplifiedGraph)$size,
-                      vertex.color = igraph::V(simplifiedGraph)$color,
-                      layout = igraph::layout_with_fr(simplifiedGraph))
+    # Create the graph and a legend
+    par(mar = c(0,0,0,0))
+    plotGraph <- plot(networkGraph, 
+                      vertex.label = NA, 
+                      layout = test.layout,
+                      vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
+                      vertex.size = 3,
+                      edge.color = adjustcolor("grey", alpha.f = 0.3))
+    legend("topright", 
+           legend = paste("Community", seq(length(communities))), 
+           col = communityColors, 
+           pch = 16, 
+           cex = 0.8,
+           ncol = ifelse(length(communities) > 10, 2, 1))
     
     # Print a list of the genes in each community to the screen
     printCommunities(networkGraph = networkGraph,
