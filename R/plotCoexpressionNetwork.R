@@ -1,7 +1,9 @@
 #' Create a co-expression network graph. Each gene will be a node, and if the
 #' genes are co-expressed, there will be an edge connecting them. If separate
 #' communities/clusters of co-expressed genes are detected, each community
-#' will be a different color. 
+#' will be a different color. If there is not enough data to detect communities
+#' accurately, communities will not be included, and instead the top 100
+#' genes (sorted by correlation) will be plotted. 
 #' 
 #' @param edgeList A list of all the genes that should have an edge between
 #'    them because they are co-expressed
@@ -23,7 +25,7 @@
 #' coexprNetworkGraph
 #' 
 #' @export
-#' @importFrom igraph graph_from_data_frame layout_with_fr
+#' @import igraph
 plotCoexpressionNetwork <- function(edgeList) {
   
   if (!is.data.frame(edgeList)) {
@@ -42,21 +44,29 @@ plotCoexpressionNetwork <- function(edgeList) {
   communities <- igraph::cluster_louvain(networkGraph)
   
   # Plot the nodes with gene labels and without communities if there are more 
-  # than 10 communities
-  if (length(communities) > 10) {
-    message("There were more than 10 communities detected. This most likely
+  # than 20 communities
+  if (length(communities) > 20) {
+    message("There were more than 20 communities detected. This most likely
             indicates that there is not enough data to detect communities.
             The coexpression plot will be made without the communities
             labelled.")
     
-    # Choose the large graph layout
-    layout <- igraph::layout_with_lgl(networkGraph)
+    # Select the top 1000 genes by correlation if there are more than 1000
+    if (nrows(edgeList) > 1000) {
+      topGenes <- edgeList %>%
+        dplyr::arrange(desc(Correlation)) %>%
+        dplyr::slice_head(n = 1000)
+      
+      # Create a new graph with only the top genes
+      networkGraph <- igraph::graph_from_data_frame(topGenes, 
+                                                    directed = FALSE)
+    } 
 
     plotGraph <- plot(networkGraph,
                       vertex.label = igraph::V(networkGraph)$name,
-                      vertex.label.cex = 0.5,
+                      vertex.label.cex = 0.25,
                       vertex.label.dist = 1.5,
-                      layout = layout,
+                      layout = igraph::layout_with_fr(networkGraph),
                       vertex.color = "lightblue",
                       vertex.size = 3,
                       edge.color = adjustcolor("grey", alpha.f = 0.3))
@@ -64,23 +74,23 @@ plotCoexpressionNetwork <- function(edgeList) {
   } else {
     message(sprintf("There were %s communities detected.", length(communities)))
     
-    # Assign a color to each community
-    communityColors <- rainbow(length(communities))
-    vertexColor <- communityColors[communities$membership]
+    # Create a simplified graph where each community is represented by a single
+    # node where the size of the node is proportional to the number of genes 
+    # in the community
+    communitySizes <- table(communities$membership)
+    simplifiedGraph <- igraph::make_empty_graph(n = length(communitySizes))
+    igraph::V(simplifiedGraph)$size <- communitySizes / 3
+    igraph::V(simplifiedGraph)$name <- names(communitySizes)
+    igraph::V(simplifiedGraph)$color <- rainbow(length(communitySizes))
     
-    # Create the graph and a legend
-    plotGraph <- plot(networkGraph, 
-                      vertex.label = NA, 
-                      layout =  igraph::layout_with_fr(networkGraph),
-                      vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
-                      vertex.size = 3,
-                      edge.color = adjustcolor("grey", alpha.f = 0.3))
-    legend("topright", 
-           legend = paste("Community", seq(length(communities))), 
-           col = communityColors, 
-           pch = 16, 
-           cex = 0.8,
-           ncol = ifelse(length(communities) > 10, 2, 1))
+    # Now plot the simplified graph
+    plotGraph <- plot(simplifiedGraph,
+                      vertex.label = igraph::V(simplifiedGraph)$name,
+                      vertex.label.cex = 0.8,
+                      vertex.label.color = "black",
+                      vertex.size = igraph::V(simplifiedGraph)$size,
+                      vertex.color = igraph::V(simplifiedGraph)$color,
+                      layout = igraph::layout_with_fr(simplifiedGraph))
     
     # Print a list of the genes in each community to the screen
     printCommunities(networkGraph = networkGraph,
