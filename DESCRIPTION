@@ -7,11 +7,11 @@ Authors@R: person("Vishali", "Umaiyalan",
                   role = c("aut", "cre"))
 Maintainer: Vishali Umaiyalan <vishali.umaiyalan@mail.utoronto.ca>
 Description: DiffCoExpr is an R package that will compare co-expression networks 
-constructed from scRNA-seq data. It can be used to compare co-expression networks 
-under two different conditions and compare co-expression networks between 
-cell-types to determine if co-expression is cell-type specific. Additionally, 
-DiffCoExpr offers the ability to construct co-variance matrices as well to 
-determine if gene expression changes are correlated.
+     constructed from scRNA-seq data. It can be used to compare co-expression networks 
+     under two different conditions and compare co-expression networks between 
+     cell-types to determine if co-expression is cell-type specific. Additionally, 
+     DiffCoExpr offers the ability to construct co-variance matrices as well to 
+     determine if gene expression changes are correlated.
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
