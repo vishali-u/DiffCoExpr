@@ -7,7 +7,12 @@ little variation across cells are filtered out. In the matrix, each
 row and column are genes, and each cell contains the correlation between the
 pair of genes.}
 \usage{
-getCorrelationMatrix(expressionMatrix, minCellCount = 5, minGeneCount = 5)
+getCorrelationMatrix(
+  expressionMatrix,
+  minCellCount = 5,
+  minGeneCount = 5,
+  minPt = 0.2
+)
 }
 \arguments{
 \item{expressionMatrix}{A matrix containing the expression levels of genes
@@ -15,11 +20,18 @@ per cell. The rows are genes and the columns are cells}
 
 \item{minCellCount}{A minimum number of cells that should still be present
 in the data after filtering. If the number of cells after filtering is
-less than this value, stop running. The default is set to 5.}
+less than this value, stop running. The default is set to 5. This value
+must be greater than 2}
 
 \item{minGeneCount}{A minimum number of genes that should still be present
 in the data after filtering. If the number of genes after filtering is
-less than this value, stop running. The default is set to 5.}
+less than this value, stop running. The default is set to 5. This value
+must be greater than 2.}
+
+\item{minPt}{A miminum percent to filter out genes. Any genes that have a
+variation that is less than the variation at minPt percentile will be
+removed. Value must be be greater than 0 and less than or equal to 1.
+Default is 0.20}
 }
 \value{
 A matrix where the rows and columns are genes, and the cell contains
@@ -36,7 +48,7 @@ pair of genes.
 # that is available in this package. This matrix only includes platelet
 # cells.
 exprMatrixPath <- system.file("extdata", 
-                              "expressionMatrix.csv", 
+                              "expressionMatrixPlatelet.csv", 
                                package = "DiffCoExpr")
 exprMatrix <- read.csv(exprMatrixPath)
 # Set the row names and remove the column containing gene names

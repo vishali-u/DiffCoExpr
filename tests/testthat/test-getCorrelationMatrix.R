@@ -1,30 +1,24 @@
 library(DiffCoExpr)
-set.seed(0)
 
 test_that("Input that will not throw errors", {
-  srat <- prepareData(
-    geneMatrixPath = system.file("extdata",
-                                 "filtered_gene_bc_matrices",
-                                 package =  "DiffCoExpr"),
-    cellTypesPath = system.file("extdata",
-                                "cellTypes.csv",
-                                package =  "DiffCoExpr")
-  )
   
-  filteredExprMatrix <- getExpressionMatrix(
-    srat = srat,
-    cellType = "B"
-  )
+  filteredExprMatrixPath <- system.file("extdata", 
+                                        "expressionMatrixDC.csv",
+                                        package = "DiffCoExpr")
+  
+  filteredExprMatrix <- read.csv(filteredExprMatrixPath)
+  rownames(filteredExprMatrix) <- filteredExprMatrix[, 1]
+  filteredExprMatrix <- filteredExprMatrix[, -1]
   
   corrMatrix <- getCorrelationMatrix(
     expressionMatrix = filteredExprMatrix
   )
   
   # Check that the correlation matrix is a square matrix
-  expect_identical(nrow(corrMatrix), ncol(corrMatrix)[2])
+  expect_identical(nrow(corrMatrix), ncol(corrMatrix))
   
   # Check that genes were filtered out
-  expect_lt(nrow(filteredExprMatrix), nrow(corrMatrix))
+  expect_lt(nrow(corrMatrix), nrow(filteredExprMatrix))
   
   expect_warning(getCorrelationMatrix(expressionMatrix = filteredExprMatrix,
                                       minPt = 1.5))
@@ -55,8 +49,8 @@ test_that("Input that will throw errors", {
   
   # Test on a 1x2 matrix
   smallTestMatrix <- matrix(c(1, 2), nrow = 2, ncol = 1)
-  geneNames <- paste("Gene", 1:1, sep = "_")
-  cellBarcodes <- paste("Cell", 1:2, sep = "_")
+  geneNames <- paste("Gene", 1:2, sep = "_")
+  cellBarcodes <- paste("Cell", 1:1, sep = "_")
   rownames(smallTestMatrix) <- geneNames
   colnames(smallTestMatrix) <- cellBarcodes
   expect_error(getCorrelationMatrix(expressionMatrix = smallTestMatrix))
