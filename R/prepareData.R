@@ -126,6 +126,10 @@ prepareData <- function(geneMatrixPath,
   cellTypes <- strsplit(as.character(originalCellTypes$Markers), ",\\s*")
   names(cellTypes) <- originalCellTypes$Cell.Type
   
+  # Print the cell types to the console
+  cellTypesString <- paste(names(cellTypes), collapse = ", ")
+  message("Cell Types: ", cellTypesString)
+  
   # Create a data frame mapping cluster ID to a comma separated string of all
   # marker genes in that string
   markersSubset <- srat.markers[, c("cluster", "gene")]

@@ -4,6 +4,9 @@
 #' 
 #' extdata/filtered_gene_bc_matrices contains the matrices from this experiment
 #' 
+#' The raw data was downloaded from the 10X website, and the cell type lables
+#' were taken from a Seurat tutorial in the Seurat package.
+#' 
 #' @source 10X Genomics
 #' 
 #' @format A data frame with 9 observations and 2 variables
@@ -14,6 +17,9 @@
 #' }
 #' 
 #' @references 
+#' 10X Genomics. 2016. “3k PBMCs from a Healthy Donor.” 
+#' data \href{https://www.10xgenomics.com/resources/datasets}{Link}.
+#' 
 #' Butler, A. (2015). Seurat: Tools for Single Cell Genomics
 #' R package version 4.4.0
 #' data \href{https://cran.r-project.org/web/packages/Seurat/}{Link}.

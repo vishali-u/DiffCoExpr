@@ -25,7 +25,7 @@
 #' coexprNetworkGraph
 #' 
 #' @export
-#' @import igraph
+#' @importFrom igraph graph_from_data_frame cluster_louvain V layout_with_fr
 plotCoexpressionNetwork <- function(edgeList) {
   
   if (!is.data.frame(edgeList)) {
@@ -83,7 +83,7 @@ plotCoexpressionNetwork <- function(edgeList) {
     par(mar = c(0,0,0,0))
     plotGraph <- plot(networkGraph, 
                       vertex.label = NA, 
-                      layout = test.layout,
+                      layout = igraph::layout_with_fr(networkGraph),
                       vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
                       vertex.size = 3,
                       edge.color = adjustcolor("grey", alpha.f = 0.3))
@@ -98,7 +98,7 @@ plotCoexpressionNetwork <- function(edgeList) {
     printCommunities(networkGraph = networkGraph,
                      communities = communities)
   }
-  return(plotGraph)
+  return(1)
 }
 
 #' Print what genes are part of the same community

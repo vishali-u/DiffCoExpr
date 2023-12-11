@@ -76,7 +76,7 @@
 #'     gene 2 under two different conditions
 #' 
 #' @import ggplot2
-#' @import dplyr
+#' @importFrom dplyr inner_join 
 #' @export
 plotDifferentialCoexpression <- function(networkA, 
                                          networkB, 
@@ -232,7 +232,7 @@ checkForIncorrectInput <- function(exprMatrix, coexprNetwork, gene1, gene2) {
 #' @return the row in mergedList containing gene1 and gene2 if they are 
 #'     coexpressed in both networks
 #' 
-#' @import dplyr
+#' @importFrom dplyr filter
 checkGeneCoexpression <- function(mergedList, gene1, gene2) {
   
   sortedGenes <- sort(c(gene1, gene2))
