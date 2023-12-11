@@ -67,7 +67,7 @@
 #' plot <- plotDifferentialCoexpression(networkA = coexprNetPlatelet, 
 #'                                      networkB = coexprNetDC, 
 #'                                      gene1 = gene1, 
-#'                                      gene2 = gene2
+#'                                      gene2 = gene2,
 #'                                      expressionMatrixA = exprMatrixPlatelet,
 #'                                      expressionMatrixB = exprMatrixDC)
 #' plot
@@ -75,7 +75,8 @@
 #' @return a scatter plot of expression level of gene1 vs. expression level of
 #'     gene 2 under two different conditions
 #' 
-#' @import dplyr, ggplot2
+#' @import ggplot2
+#' @import dplyr
 #' @export
 plotDifferentialCoexpression <- function(networkA, 
                                          networkB, 
@@ -154,7 +155,7 @@ plotDifferentialCoexpression <- function(networkA,
     ggplot2::theme_gray()
   
 
-  return()
+  return(plot)
 }
 
 #' 'Normalize' the coexpression network so that the gene that comes first

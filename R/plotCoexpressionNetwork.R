@@ -40,30 +40,52 @@ plotCoexpressionNetwork <- function(edgeList) {
   
   # Identify communities
   communities <- igraph::cluster_louvain(networkGraph)
-  message(sprintf("There were %s communities detected.", length(communities)))
   
-  # Assign a color to each community
-  communityColors <- rainbow(length(communities))
-  vertexColor <- communityColors[communities$membership]
-  
-  # Create the graph and a legend
-  # Choose large graph layout
-  layout <- igraph::layout_with_lgl(networkGraph) 
-  plotGraph <- plot(networkGraph, 
-                    vertex.label = NA, 
-                    layout = layout,
-                    vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
-                    vertex.size = 4,
-                    edge.color = adjustcolor("grey", alpha.f = 0.3))
-  legend("topright", 
-         legend = paste("Community", seq(length(communities))), 
-         col = communityColors, 
-         pch = 16)
-  
-  # Print a list of the genes in each community to the screen
-  printCommunities(networkGraph = networkGraph,
-                   communities = communities)
-  
+  # Plot the nodes with gene labels and without communities if there are more 
+  # than 10 communities
+  if (length(communities) > 10) {
+    message("There were more than 10 communities detected. This most likely
+            indicates that there is not enough data to detect communities.
+            The coexpression plot will be made without the communities
+            labelled.")
+    
+    # Choose the large graph layout
+    layout <- igraph::layout_with_lgl(networkGraph)
+
+    plotGraph <- plot(networkGraph,
+                      vertex.label = igraph::V(networkGraph)$name,
+                      vertex.label.cex = 0.5,
+                      vertex.label.dist = 1.5,
+                      layout = layout,
+                      vertex.color = "lightblue",
+                      vertex.size = 3,
+                      edge.color = adjustcolor("grey", alpha.f = 0.3))
+
+  } else {
+    message(sprintf("There were %s communities detected.", length(communities)))
+    
+    # Assign a color to each community
+    communityColors <- rainbow(length(communities))
+    vertexColor <- communityColors[communities$membership]
+    
+    # Create the graph and a legend
+    plotGraph <- plot(networkGraph, 
+                      vertex.label = NA, 
+                      layout =  igraph::layout_with_fr(networkGraph),
+                      vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
+                      vertex.size = 3,
+                      edge.color = adjustcolor("grey", alpha.f = 0.3))
+    legend("topright", 
+           legend = paste("Community", seq(length(communities))), 
+           col = communityColors, 
+           pch = 16, 
+           cex = 0.8,
+           ncol = ifelse(length(communities) > 10, 2, 1))
+    
+    # Print a list of the genes in each community to the screen
+    printCommunities(networkGraph = networkGraph,
+                     communities = communities)
+  }
   return(plotGraph)
 }
 

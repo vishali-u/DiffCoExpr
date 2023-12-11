@@ -86,9 +86,9 @@ prepareData <- function(geneMatrixPath,
   # for each cell (as a quality control). Filter results based on this.
   srat[["percent.mt"]] <- Seurat::PercentageFeatureSet(srat, 
                                                        pattern = "^MT-")
-  srat <- subset(srat, 
-                 subset = nFeature_RNA > 200 & nFeature_RNA < 2500 &
-                   percent.mt < 5)
+  srat <- 
+    subset(srat, 
+           subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
   
   # Normalize expression measurements for each cell (using default
   # normalization methods from the Seurat package)

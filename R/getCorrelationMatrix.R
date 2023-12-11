@@ -65,9 +65,9 @@ getCorrelationMatrix <- function(expressionMatrix,
   
   # Check that minPt is in the correct range
   if (minPt < 0 || minPt > 1) {
-    warning("The minPt value you provided is outside (0,1]. Using the default
+    warning("The minPt value you provided is outside (0,1]. Using the default 
             minPt of 0.20 instead.")
-    minPt = 0.20
+    minPt <- 0.20
   }
   
   # Convert the expression matrix into a data frame if it is not a data frame
@@ -94,8 +94,7 @@ getCorrelationMatrix <- function(expressionMatrix,
     dplyr::arrange(desc(geneSD))
   
   # Filter out genes with low variation (out of the genes that have some
-  # variation) by keeping the filtering out the lower 20 % of genes based on
-  # variation
+  # variation) by filtering out the lower minPt % of genes based on variation
   cutoffValue <- quantile(geneVariationTable$geneSD, minPt)
   
   # Filter out genes below the cutoff

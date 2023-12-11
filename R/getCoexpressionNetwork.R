@@ -1,14 +1,17 @@
 #' Identify the genes that have a positive correlation strictly higher than a  
-#' threshold correlation. The threshold correlation was chosen as the median 
-#' correlation out of all the positive correlations.
+#' threshold correlation.
 #' 
 #' @param correlationMatrix A matrix or data framer where each row and column 
 #'    are genes, and each cell contains the correlation between the pairs of 
 #'    genes.
+#'    
+#' @param thresholdCorrelation A percentile used to select only the genes with
+#'    a high correlation. This value must be in the range (0, 1]. The default
+#'    is 0.75, so only gene pairs that have a correlation higher than the 
+#'    correlation at the 75th percentile will be used.
 #' 
 #' @return A data frame storing pairs of genes and the correlation between
-#'     the genes that have a positive correlation above the threshold, which
-#'     is the median correlation from the input matrix
+#'     the genes that have a positive correlation above the threshold
 #'     
 #' @examples
 #' # Using an example correlation matrix that was generated using the pbmc data
@@ -26,7 +29,8 @@
 #' coexprNetwork
 #' 
 #' @export
-getCoexpressionNetwork <- function(correlationMatrix) {
+getCoexpressionNetwork <- function(correlationMatrix,
+                                   thresholdCorrelation = 0.75) {
   
   if (! is.matrix(correlationMatrix) && ! is.data.frame(correlationMatrix)) {
     stop("Please provide a matrix or data.frame object for correlationMatrix.")
@@ -40,6 +44,13 @@ getCoexpressionNetwork <- function(correlationMatrix) {
   # Check that the input is a square matrix/data.frame
   if (nrow(correlationMatrix) != ncol(correlationMatrix)) {
     stop("The correlation matrix should be a square matrix.")
+  }
+  
+  # Check that thresholdCorrelation is in the correct range
+  if (thresholdCorrelation <= 0 || thresholdCorrelation > 1) {
+    warning("The thresholdCorrelation value you provided is outside (0,1]. 
+            Using the default thresholdCorrelation of 0.75 instead.")
+    thresholdCorrelation <- 0.75
   }
   
   # Set correlation to NA where the correlation is less than or equal to 0
@@ -64,13 +75,11 @@ getCoexpressionNetwork <- function(correlationMatrix) {
   positiveCorrelationPairs <- subset(positiveCorrelationPairs, 
                                      Gene1 < Gene2)
   
-  # Calculate the median of all the positive correlations
-  medianCorrelation <- median(positiveCorrelationPairs$Correlation, 
-                              na.rm = TRUE)
-  
-  # Only keep the pairs that have a correlation higher than the median
+  # Only keep the pairs that have a correlation higher than the threshold
+  cutoffValue <- quantile(positiveCorrelationPairs$Correlation, 
+                          thresholdCorrelation)
   edgeList <- positiveCorrelationPairs[positiveCorrelationPairs$Correlation > 
-                                         medianCorrelation, ]
+                                         cutoffValue, ]
   
   return(edgeList)
 }

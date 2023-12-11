@@ -56,32 +56,27 @@ data(package = "DiffCoExpr")
 
 ## Tutorial on 3k PBMCs from a Healthy Donor Datasest downloaded from 10X Genomics
 
-This document will go over the steps needed to construct and compare co-expression networks generated from peripheral blood mononuclear cells (PBMCs) 
-from a healthy donor. There are 2,700 cells in total in this dataset. 
+This document will go over the steps needed to construct and compare coexpression networks generated from peripheral blood mononuclear cells (PBMCs) from a healthy donor. There are 2,700 cells in total in this dataset. 
 
 ### Step 1: Prepare the data
 To construct a Seurat object containing normalized counts and annotated clusters using the sample data:
+
 ``` r
-gene_bc_matrix_path <- system.file('extdata', 'pbmc', 'filtered_gene_bc_matrices', package = "DiffCoExpr")
-cell_types_path <- system.file('extdata', 'pbmc', 'cell_types.csv', package = "DiffCoExpr")
-srat <- prepareData(gene_bc_matrix_path = gene_bc_matrix_path, cell_types_path = cell_types_path)
+geneBCMatrixPath <- system.file("extdata", "filtered_gene_bc_matrices", package = "DiffCoExpr")
+cellTypesPath <- system.file("extdata", "cellTypes.csv", package = "DiffCoExpr")
+srat <- prepareData(geneMatrixPath = geneBCMatrixPath, cellTypesPath = cellTypesPath)
 ```
+
 To examine the cell identities in the Seurat object:
 ``` r
 Idents(srat)
 ```
 
 ### Step 2: Construct the expression and correlation matrices
-We can limit our data to just one cell type. Here we are only interested in constructing the matrices for B cells. To create expression and correlation matrices:
+We can limit our data to just one cell type. Here we are only interested in constructing the matrices for B cells and the matrices for . To create expression and correlation matrices:
 ``` r
 expr_matrix <- get_expression_matrix(srat = srat, cell_type = "B")
 corr_matrix <- get_correlation_matrix(expression_matrix = expr_matrix)
-```
-
-To visualize the expression and correlation across cells and gene pairs, respectively:
-``` r
-expr_plot <- plotExpressionMatrix(expression_matrix = expr_matrix)
-corr_plot <- plotCorrelationMatrix(correlation_matrix = corr_matrix)
 ```
 
 ### Step 3: Construct a co-expression network 

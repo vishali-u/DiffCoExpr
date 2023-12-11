@@ -15,8 +15,8 @@ testMatrixA <- matrix(c(12, 22, 36, 47, 45, 66, 77, 84, 92, 10,
                         81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
                         91, 92, 93, 94, 95, 96, 97, 98, 99, 100), 
                       nrow = 10, ncol = 10)
-geneNames <- paste("Gene", 1:10, sep = "_")
-cellBarcodes <- paste("Cell", 1:10, sep = "_")
+geneNames <- paste("Gene", 1:10, sep = "")
+cellBarcodes <- paste("Cell", 1:10, sep = "")
 rownames(testMatrixA) <- geneNames
 colnames(testMatrixA) <- cellBarcodes
 
@@ -31,8 +31,8 @@ testMatrixB <- matrix(c(20, 12, 23, 44, 45, 66, 73, 82, 19, 10,
                         81, 82, 83, 84, 85, 86, 87, 88, 89, 90,
                         91, 92, 93, 94, 95, 96, 97, 98, 99, 100), 
                       nrow = 10, ncol = 10)
-geneNames <- paste("Gene", 1:10, sep = "_")
-cellBarcodes <- paste("Cell", 1:10, sep = "_")
+geneNames <- paste("Gene", 1:10, sep = "")
+cellBarcodes <- paste("Cell", 1:10, sep = "")
 rownames(testMatrixB) <- geneNames
 colnames(testMatrixB) <- cellBarcodes
 
@@ -62,7 +62,7 @@ test_that("Valid Input", {
                                        gene2 = gene2,
                                        expressionMatrixA = testMatrixA, 
                                        expressionMatrixB = testMatrixB)
-  expect_true(is.ggplot(plot))
+  expect_true(ggplot2::is.ggplot(plot))
 })
 
 test_that("Invalid Input", {

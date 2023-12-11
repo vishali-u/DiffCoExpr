@@ -15,7 +15,6 @@ Imports:
     dplyr,
     ggplot2,
     Seurat,
-    ComplexHeatmap,
     igraph
 License: MIT + file LICENSE
 Roxygen: list(markdown = TRUE)
