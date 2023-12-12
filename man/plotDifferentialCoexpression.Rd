@@ -2,9 +2,9 @@
 % Please edit documentation in R/plotDifferentialCoexpression.R
 \name{plotDifferentialCoexpression}
 \alias{plotDifferentialCoexpression}
-\title{Given a dataframe of differentially coexpressed genes and expression matrices
-that were used to generate the list of differentially coexpressed genes and
-two co-expressed genes, plot the expression level of each gene across cells
+\title{Given a table of differentially coexpressed genes, the expression matrices
+that were used to generate the table of differentially coexpressed genes, and
+two coexpressed genes, plot the expression level of each gene across cells
 under each condition as a scatter plot. The x-axis is expression of one gene
 and the y-axis is expression of the other gene. Each point represents the
 expression level of one gene in one cell under one condition vs. the
@@ -56,9 +56,9 @@ a scatter plot of expression level of gene1 vs. expression level of
 gene 2 under two different conditions
 }
 \description{
-Given a dataframe of differentially coexpressed genes and expression matrices
-that were used to generate the list of differentially coexpressed genes and
-two co-expressed genes, plot the expression level of each gene across cells
+Given a table of differentially coexpressed genes, the expression matrices
+that were used to generate the table of differentially coexpressed genes, and
+two coexpressed genes, plot the expression level of each gene across cells
 under each condition as a scatter plot. The x-axis is expression of one gene
 and the y-axis is expression of the other gene. Each point represents the
 expression level of one gene in one cell under one condition vs. the

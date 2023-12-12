@@ -7,7 +7,7 @@ in both networks. Return a dataframe of all the genes that are coexpressed
 in both networks, and quantify differential coexpression using log fold
 change.}
 \usage{
-getDifferentialCoexpression(networkA, networkB, thresholdLogFC = 0.2)
+getDifferentialCoexpression(networkA, networkB, thresholdLogFC = 0.5)
 }
 \arguments{
 \item{networkA}{An edge list for a coexpression network. Contains the
@@ -17,7 +17,7 @@ correlation coefficient between pairs of genes.}
 Contains the correlation coefficient between pairs of genes.}
 
 \item{thresholdLogFC}{A minimum log2 fold change to be used for filtering
-out gene pairs}
+out gene pairs. Default is 0.5}
 }
 \value{
 a dataframe where each row contains a pair of genes and the
