@@ -10,7 +10,7 @@
 #'     Contains the correlation coefficient between pairs of genes. 
 #'     
 #' @param thresholdLogFC A minimum log2 fold change to be used for filtering
-#'     out gene pairs    
+#'     out gene pairs. Default is 0.5
 #'     
 #' @examples
 #' # Using an example data that was generated using the pbmc data that is
@@ -43,7 +43,7 @@
 #' @export
 getDifferentialCoexpression <- function(networkA, 
                                         networkB, 
-                                        thresholdLogFC = 0.20) {
+                                        thresholdLogFC = 0.50) {
   
   # --- Checks for invalid input -------------------------------------------
   

@@ -92,26 +92,32 @@ ui <- fluidPage(
                 your analysis after filtering. This should be a positive value
                 greater than 2:", "5"),
       
-      textInput(inputId = "thresholdVariation",
-                label = "Enter value between 0 and 1. This value will be the
-                percentile used to filter out genes with low variation. For
-                example, the default is 0.20, so any genes that have a 
-                variation lower than the variation at the 20th percentile will
-                be filtered out:", "0.2"),
+      sliderInput(inputId = "thresholdVariation",
+                  label = "Choose a value between 0 and 1. This value will be the
+                  percentile used to filter out genes with low variation. For
+                  example, the default is 0.20, so any genes that have a 
+                  variation lower than the variation at the 20th percentile will
+                  be filtered out:", 
+                  min = 0,
+                  max = 1,
+                  value = 0.2),
       
-      textInput(inputId = "thresholdCorrelation",
-                label = "Enter value between 0 and 1. This value will be the
-                percentile used to filter out pairs of genes with low
-                correlations. For example, the default is 0.80, so any pairs of
-                genes that have a correlation lower than the correlation at the 
-                80th percentile will be filtered out:", "0.8"),
+      sliderInput(inputId = "thresholdCorrelation",
+                  label = "Choose a value between 0 and 1. This value will be the
+                  percentile used to filter out pairs of genes with low
+                  correlations. For example, the default is 0.80, so any pairs of
+                  genes that have a correlation lower than the correlation at the 
+                  80th percentile will be filtered out:", 
+                  min = 0, 
+                  max = 1,
+                  value = 0.8),
       
       textInput(inputId = "thresholdFC",
-                label = "Enter value between 0 and 1. This value will be the 
-                minimum log2 fold change of correlation values calculated
+                label = "Enter a threshold for correlation. This value will be
+                the minimum log2 fold change of correlation values calculated
                 from two coexpression networks. For example, the default
-                value is 0.20, so any pairs of genes that have a log2 fold 
-                change less than 0.20 will be filtered out.", "0.2"),
+                value is 0.50, so any pairs of genes that have a log2 fold 
+                change less than 0.50 will be filtered out.", "0.5"),
       
       # actionButton
       actionButton(inputId = "button1",
@@ -181,6 +187,8 @@ ui <- fluidPage(
 # Define server logic for random distribution app ----
 server <- function(input, output, session) {
   
+  # Define the reactive value for status
+  status <- reactiveVal("Ready")
   
   # URLs for downloading data ----
   url1 <- a("Example Dataset: Gene BC Matrices", 
@@ -248,7 +256,6 @@ server <- function(input, output, session) {
     
     DiffCoExpr::prepareData(geneMatrixPath = input$geneBCPath,
                             cellTypesPath = input$cellTypesPath$datapath)
-    
   })
   
   # Create expression matrix separately because it will be needed again for
@@ -256,9 +263,11 @@ server <- function(input, output, session) {
   startExprMatrixA <- eventReactive(eventExpr = input$button1, {
     
     if (! is.null(startPrepareData)) {
-      DiffCoExpr::getExpressionMatrix(srat = startPrepareData(),
+      srat <- startPrepareData()
+      DiffCoExpr::getExpressionMatrix(srat = srat,
                                       cellType = input$cellTypeA)
     }
+  
   })
   
   startCoExprNetA <- eventReactive(eventExpr = input$button1, {
@@ -267,12 +276,12 @@ server <- function(input, output, session) {
       
       corrMatrixA <-
         DiffCoExpr::getCorrelationMatrix(expressionMatrix = startExprMatrixA(),
-                                         minCellCount = input$minCellCount,
-                                         minGeneCount = input$minGeneCount,
-                                         minPt = input$thresholdVariation)
-      
+                                         minCellCount = as.numeric(input$minCellCount),
+                                         minGeneCount = as.numeric(input$minGeneCount),
+                                         minPt = as.numeric(input$thresholdVariation))
+
       DiffCoExpr::getCoexpressionNetwork(correlationMatrix = corrMatrixA,
-                                         thresholdCorrelation = input$thresholdCorrelation)
+                                         thresholdCorrelation = as.numeric(input$thresholdCorrelation))
       
     }
   })
@@ -292,12 +301,12 @@ server <- function(input, output, session) {
       
       corrMatrixB <-
         DiffCoExpr::getCorrelationMatrix(expressionMatrix = startExprMatrixB(),
-                                         minCellCount = input$minCellCount,
-                                         minGeneCount = input$minGeneCount,
-                                         minPt = input$thresholdVariation)
+                                         minCellCount = as.numeric(input$minCellCount),
+                                         minGeneCount = as.numeric(input$minGeneCount),
+                                         minPt = as.numeric(input$thresholdVariation))
       
       DiffCoExpr::getCoexpressionNetwork(correlationMatrix = corrMatrixB,
-                                         thresholdCorrelation = input$thresholdCorrelation)
+                                         thresholdCorrelation = as.numeric(input$thresholdCorrelation))
       
     }
   })
@@ -306,14 +315,13 @@ server <- function(input, output, session) {
     if ((! is.null(startCoExprNetA)) && (! is.null(startCoExprNetA))) {
       DiffCoExpr::getDifferentialCoexpression(networkA = startCoExprNetA,
                                               networkB = startCoExprNetB,
-                                              thresholdLogFC = input$thresholdFC)
+                                              thresholdLogFC = as.numeric(input$thresholdFC))
     }
   })
   
   startDiffCoExprPlot <- eventReactive(eventExpr = input$button2, {
     if ((! is.null(startDiffCoExpr)) && (! is.null(startExprMatrixA)) &&
         (! is.null(startExprMatrixB))) {
-      
     }
   })
   
@@ -325,7 +333,7 @@ server <- function(input, output, session) {
   })
   
   # Coexpression plotting
-  output$OuputPlot <- renderPlot({
+  output$CoexprNetworkPlot <- renderPlot({
     if (! is.null(startCoExprNetA))
       DiffCoExpr::plotCoexpressionNetwork(edgeList = startCoExprNetA())
   })

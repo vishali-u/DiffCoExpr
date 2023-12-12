@@ -6,7 +6,7 @@
 #'    genes.
 #'    
 #' @param thresholdCorrelation A percentile used to select only the genes with
-#'    a high correlation. This value must be in the range (0, 1]. The default
+#'    a high correlation. This value must be in the range [0, 1]. The default
 #'    is 0.80, so only gene pairs that have a correlation higher than the 
 #'    correlation at the 80th percentile will be used.
 #' 
@@ -50,7 +50,7 @@ getCoexpressionNetwork <- function(correlationMatrix,
   }
   
   # Check that thresholdCorrelation is in the correct range
-  if (thresholdCorrelation <= 0 || thresholdCorrelation > 1) {
+  if (thresholdCorrelation < 0 || thresholdCorrelation > 1) {
     warning("The thresholdCorrelation value you provided is outside (0,1]. 
             Using the default thresholdCorrelation of 0.80 instead.")
     thresholdCorrelation <- 0.80
