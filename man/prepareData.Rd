@@ -20,14 +20,14 @@ cell type labels}
 }
 \value{
 Returns an object of class SeuratObject that stores the data for
-a single cell RNA-seq experiment
+a single cell RNA-seq experimentUsing pbmc dataset available with packageTakes too long to run
 }
 \description{
 Prepare the scRNA-seq data for analysis by normalizing, clustering, and
 assigning cell type to cluster if applicable
 }
 \examples{
-# Using pbmc dataset available with package
+\dontrun{
 geneMatrixPath <- system.file("extdata",
                               "filtered_gene_bc_matrices",
                                package =  "DiffCoExpr")
@@ -38,6 +38,7 @@ cellTypes <- system.file("extdata",
 pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
                     cellTypesPath = cellTypes)
 pbmc
+}
 
 }
 \references{

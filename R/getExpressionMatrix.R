@@ -18,6 +18,7 @@
 #'    that cell.
 #' 
 #' @examples
+#' \dontrun{
 #' # Using pbmc dataset available with package
 #' geneMatrixPath <- system.file("extdata",
 #'                               "filtered_gene_bc_matrices",
@@ -32,6 +33,7 @@
 #' exprMatrix <- getExpressionMatrix(srat = pbmc, 
 #'                                   cellType = "Platelet")
 #' exprMatrix
+#' }
 #' 
 #' @references 
 #' Butler, A. (2015). Seurat: Tools for Single Cell Genomics

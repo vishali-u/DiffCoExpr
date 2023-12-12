@@ -5,8 +5,8 @@
 \alias{coexpressionNetworkPlatelet}
 \title{An example coexpression network that was generated using the same PBMC
 data. To generate the data, we ran prepareData using the example
-data in the package, getExpressionMatrix with the cell type
-set to "Platelet", getCorrelationMatrix with the expression, and finally
+data in the package, getExpressionMatrix with the cell type set to
+"Platelet", getCorrelationMatrix with the expression maxtris, and finally
 getCoexpressionNetwork with the correlation matrix. This object was included
 to make the examples in the function descriptions run faster.}
 \format{
@@ -23,8 +23,8 @@ coexpressionNetworkPlatelet
 \description{
 An example coexpression network that was generated using the same PBMC
 data. To generate the data, we ran prepareData using the example
-data in the package, getExpressionMatrix with the cell type
-set to "Platelet", getCorrelationMatrix with the expression, and finally
+data in the package, getExpressionMatrix with the cell type set to
+"Platelet", getCorrelationMatrix with the expression maxtris, and finally
 getCoexpressionNetwork with the correlation matrix. This object was included
 to make the examples in the function descriptions run faster.
 }

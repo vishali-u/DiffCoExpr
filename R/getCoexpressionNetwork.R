@@ -28,6 +28,11 @@
 #' coexprNetwork <- getCoexpressionNetwork(correlationMatrix = corrMatrix)
 #' coexprNetwork
 #' 
+#' @references Lemoine G., Scott-Boyer M., Ambroise B., Perin O., Droit A 
+#' (2021) GWENA: gene co-expression networks analysis and extended modules 
+#' characterization in a single Bioconductor package. BMC Bioinformatics 22.
+#' \href{https://doi.org/10.1186/s12859-021-04179-4}{Link}
+#' 
 #' @importFrom stats quantile
 #' @export
 getCoexpressionNetwork <- function(correlationMatrix,

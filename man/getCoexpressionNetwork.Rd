@@ -13,9 +13,9 @@ are genes, and each cell contains the correlation between the pairs of
 genes.}
 
 \item{thresholdCorrelation}{A percentile used to select only the genes with
-a high correlation. This value must be in the range \link{0, 1}. The default
-is 0.80, so only gene pairs that have a correlation higher than the
-correlation at the 80th percentile will be used.}
+a high correlation. This value must be in the range from 0 to 1. The default
+default is 0.80, so only gene pairs that have a correlation higher than the
+the correlation at the 80th percentile will be used.}
 }
 \value{
 A data frame storing pairs of genes and the correlation between

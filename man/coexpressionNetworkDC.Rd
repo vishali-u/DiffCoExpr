@@ -6,7 +6,7 @@
 \title{Another example coexpression network that was generated using the same PBMC
 data. To generate the data, we ran prepareData using the example
 data in the package, getExpressionMatrix with the cell type
-set to "DC", getCorrelationMatrix with the expression, and finally
+set to "DC", getCorrelationMatrix with the expression matrix, and finally
 getCoexpressionNetwork with the correlation matrix. This object was included
 to make the examples in the function descriptions run faster.}
 \format{
@@ -24,7 +24,7 @@ coexpressionNetworkDC
 Another example coexpression network that was generated using the same PBMC
 data. To generate the data, we ran prepareData using the example
 data in the package, getExpressionMatrix with the cell type
-set to "DC", getCorrelationMatrix with the expression, and finally
+set to "DC", getCorrelationMatrix with the expression matrix, and finally
 getCoexpressionNetwork with the correlation matrix. This object was included
 to make the examples in the function descriptions run faster.
 }
