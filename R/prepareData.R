@@ -14,8 +14,10 @@
 #' @return Returns an object of class SeuratObject that stores the data for
 #'    a single cell RNA-seq experiment
 #' 
-#' @examples
 #' # Using pbmc dataset available with package
+#' # Takes too long to run
+#' @examples
+#' \dontrun{
 #' geneMatrixPath <- system.file("extdata",
 #'                               "filtered_gene_bc_matrices",
 #'                                package =  "DiffCoExpr")
@@ -26,6 +28,7 @@
 #' pbmc <- prepareData(geneMatrixPath = geneMatrixPath,
 #'                     cellTypesPath = cellTypes)
 #' pbmc
+#' }
 #' 
 #' @references
 #' Butler A, Hoffman P, Smibert P, Papalexi E, Satija R (2018). 
