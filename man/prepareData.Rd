@@ -14,7 +14,9 @@ cellranger will produce a directory containing 3 files: matrix.mtx,
 genes.tsv/features.tsv, and barcodes.tsv)}
 
 \item{cellTypesPath}{A path to a csv file that maps marker genes to cell
-type; default value is NULL (the clusters are not assigned a cell type).}
+type; default value is NULL (the clusters are not assigned a cell type).
+The first column must be the marker genes and the second column must be
+cell type labels}
 }
 \value{
 Returns an object of class SeuratObject that stores the data for

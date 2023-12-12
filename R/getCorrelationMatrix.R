@@ -45,12 +45,15 @@
 #' in a single Bioconductor package. BMC Bioinformatics 22, 267.
 #' \href{https://doi.org/10.1186/s12859-021-04179-4}{Link}.
 #' 
-#' @export
 #' @import dplyr
+#' @importFrom stats cor sd
+#' @export
 getCorrelationMatrix <- function(expressionMatrix, 
                                  minCellCount = 5,
                                  minGeneCount = 5,
                                  minPt = 0.20) {
+  
+  # --- Check some conditions to stop early if necessary --------------------
   
   if (! is.matrix(expressionMatrix) && ! is.data.frame(expressionMatrix)) {
     stop("Please provide a matrix or data.frame object for the 
@@ -81,10 +84,12 @@ getCorrelationMatrix <- function(expressionMatrix,
          non-numeric values.")
   }
   
+  # --- Filter out genes that show little to no variation --------------------
+  
   # Filter out genes with zero variation
   # Calculate standard deviation for each gene and filter out genes with 0
   # standard variation
-  geneSD <- apply(expressionMatrix, 1, sd)
+  geneSD <- apply(expressionMatrix, 1, stats::sd)
   geneSD <- geneSD[geneSD > 0]
   expressionMatrix <- expressionMatrix[names(geneSD), ]
   
@@ -106,6 +111,8 @@ getCorrelationMatrix <- function(expressionMatrix,
   # Convert data frame back to matrix
   expressionMatrix <- as.matrix(expressionMatrix)
   
+  # --- Make sure output is still large enough to continue analysis ----------
+  
   # if too many rows got filtered out and there are less than 5 cells and 5
   # genes, stop running
   if (nrow(expressionMatrix) < minCellCount || 
@@ -115,7 +122,7 @@ getCorrelationMatrix <- function(expressionMatrix,
   }
   
   # Compute the correlation matrix (for Pearson correlation)
-  correlationMatrix <- cor(t(expressionMatrix), method = "pearson")
+  correlationMatrix <- stats::cor(t(expressionMatrix), method = "pearson")
   
   return(correlationMatrix)
 }

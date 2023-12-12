@@ -8,6 +8,8 @@
 #'    
 #' @param cellTypesPath A path to a csv file that maps marker genes to cell 
 #'    type; default value is NULL (the clusters are not assigned a cell type).
+#'    The first column must be the marker genes and the second column must be
+#'    cell type labels
 #'    
 #' @return Returns an object of class SeuratObject that stores the data for
 #'    a single cell RNA-seq experiment
@@ -37,12 +39,15 @@
 #' 
 #' @export
 #' @import Seurat
-#' 
+#' @importFrom utils read.csv
 prepareData <- function(geneMatrixPath, 
-                         cellTypesPath=NULL) {
+                        cellTypesPath=NULL) {
+  
+  # --- Check some conditions to stop early if necessary --------------------
   
   if (!dir.exists(geneMatrixPath)) {
-    stop("The gene matrices path you have provided does not exist.")
+    stop("The gene matrices path you have provided does not exist or is not a
+         directory.")
   }
   
   if (is.null(cellTypesPath)) {
@@ -75,6 +80,8 @@ prepareData <- function(geneMatrixPath,
          you provide contains matrix.mtx, genes.tsv, and either barcodes.tsv
          or features.tsv.")
   }
+  
+  # --- Start running Seurat pipeline ---------------------------------------
   
   # Load the data and store the non-normalized counts in a Seurat object
   srat.data <- Seurat::Read10X(data.dir = geneMatrixPath)
@@ -118,13 +125,15 @@ prepareData <- function(geneMatrixPath,
     return(srat)
   }
   
+  # --- Add cell type names based on cellTypes file ---------------------------
+  
   # Find all marker genes for each cluster (to annotate with cell identity)
   srat.markers <- Seurat::FindAllMarkers(srat, only.pos = TRUE)
   
   # Read in the cellTypes file and store data in a list
-  originalCellTypes <- read.csv(file = cellTypesPath)
-  cellTypes <- strsplit(as.character(originalCellTypes$Markers), ",\\s*")
-  names(cellTypes) <- originalCellTypes$Cell.Type
+  originalCellTypes <- utils::read.csv(file = cellTypesPath)
+  cellTypes <- strsplit(as.character(originalCellTypes[,1]), ",\\s*")
+  names(cellTypes) <- originalCellTypes[,2]
   
   # Print the cell types to the console
   cellTypesString <- paste(names(cellTypes), collapse = ", ")
@@ -172,3 +181,5 @@ prepareData <- function(geneMatrixPath,
   
   return(srat)
 }
+
+# [END]

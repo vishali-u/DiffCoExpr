@@ -44,24 +44,19 @@ cellBarcodes <- paste("Cell", 1:5, sep = "_")
 rownames(smallInvalidMatrix) <- geneNames
 colnames(smallInvalidMatrix) <- cellBarcodes
 
-networkA <- data.frame(Gene1 = "Gene1", 
-                       Gene2 = "Gene2", 
-                       Correlation = 0.8)
-networkB <- data.frame(Gene1 = "Gene1",
-                       Gene2 = "Gene2", 
-                       Correlation = 0.7)
-invalidNetwork <- data.frame(Gene1 = "Gene6", 
-                             Gene2 = "Gene8", 
-                             Correlation = "0.2")
+testDiffCoExpTable <- data.frame(Gene1 = c("Gene1", "Gene3"), 
+                                 Gene2 = c("Gene2", "Gene4"),
+                                 CorrelationA = c(0.8, 0.7), 
+                                 CorrelationB = c(0.5, 0.6),
+                                 foldChange = c(1.2, 3.4))
 
 test_that("Valid Input", {
 
-  plot <- plotDifferentialCoexpression(networkA = networkA, 
-                                       networkB = networkA, 
-                                       gene1 = gene1, 
-                                       gene2 = gene2,
+  plot <- plotDifferentialCoexpression(diffCoexpTable = testDiffCoExpTable,
                                        expressionMatrixA = testMatrixA, 
-                                       expressionMatrixB = testMatrixB)
+                                       expressionMatrixB = testMatrixB, 
+                                       gene1 = gene1, 
+                                       gene2 = gene2)
   expect_true(ggplot2::is.ggplot(plot))
 })
 
@@ -69,64 +64,51 @@ test_that("Invalid Input", {
   
   # Check that function throws an error with a gene not present in the data
   expect_error(
-    plotDifferentialCoexpression(networkA = networkA, 
-                                 networkB = networkB, 
-                                 gene1 = "InvalidGene", 
-                                 gene2 = gene2,
-                                 expressionMatrixA = testMatrixA,
-                                 expressionMatrixB = testMatrixB))
+    plotDifferentialCoexpression(diffCoexpTable = testDiffCoExpTable,
+                                 expressionMatrixA = testMatrixA, 
+                                 expressionMatrixB = testMatrixB, 
+                                 gene1 = "invalid gene", 
+                                 gene2 = gene2))
   
   # Check that function throws an error when trying to use the same gene
   expect_error(
-    plotDifferentialCoexpression(networkA = networkA, 
-                                 networkB = networkB, 
+    plotDifferentialCoexpression(diffCoexpTable = testDiffCoExpTable,
+                                 expressionMatrixA = testMatrixA, 
+                                 expressionMatrixB = testMatrixB, 
                                  gene1 = gene1, 
-                                 gene2 = gene1,
-                                 expressionMatrixA = testMatrixA,
-                                 expressionMatrixB = testMatrixB))
+                                 gene2 = gene1))
   
   # Check that function throws an error when an empty dataframe is used for
-  # either network or either expression matrix
+  # either expression matrix
   emptyDf <- data.frame()
   expect_error(
-    plotDifferentialCoexpression(networkA = emptyDf, 
-                                 networkB = networkB, 
+    plotDifferentialCoexpression(diffCoexpTable = testDiffCoExpTable,
+                                 expressionMatrixA = emptyDf, 
+                                 expressionMatrixB = testMatrixB, 
                                  gene1 = gene1, 
-                                 gene2 = gene1,
-                                 expressionMatrixA = testMatrixA,
-                                 expressionMatrixB = testMatrixB))
+                                 gene2 = gene2))
   expect_error(
-    plotDifferentialCoexpression(networkA = networkA, 
-                                 networkB = networkB, 
+    plotDifferentialCoexpression(diffCoexpTable = emptyDf,
+                                 expressionMatrixA = testMatrixA, 
+                                 expressionMatrixB = testMatrixB, 
                                  gene1 = gene1, 
-                                 gene2 = gene1,
-                                 expressionMatrixA = emptyDf,
-                                 expressionMatrixB = testMatrixB))
+                                 gene2 = gene2))
   
   # Check that function throws an error when the genes are found in the 
   # expression matrix but are not coexpressed
   expect_error(
-    plotDifferentialCoexpression(networkA = networkA, 
-                                 networkB = networkB, 
-                                 gene1 = gene1, 
-                                 gene2 = "Gene7",
-                                 expressionMatrixA = emptyDf,
-                                 expressionMatrixB = testMatrixB))
+    plotDifferentialCoexpression(diffCoexpTable = emptyDf,
+                                 expressionMatrixA = testMatrixA, 
+                                 expressionMatrixB = testMatrixB, 
+                                 gene1 = "Gene7", 
+                                 gene2 = gene2))
   
-  # Check that the function throws an error when the network or the expression
-  # matrix contain non-numeric values
+  # Check that the function throws an error when the expression matrix 
+  # contains non-numeric values
   expect_error(
-    plotDifferentialCoexpression(networkA = networkA, 
-                                 networkB = networkB, 
+    plotDifferentialCoexpression(diffCoexpTable = testDiffCoExpTable,
+                                 expressionMatrixA = smallInvalidMatrix, 
+                                 expressionMatrixB = testMatrixB, 
                                  gene1 = gene1, 
-                                 gene2 = "Gene7",
-                                 expressionMatrixA = smallInvalidMatrix,
-                                 expressionMatrixB = testMatrixB))
-  expect_error(
-    plotDifferentialCoexpression(networkA = smallInvalidMatrix, 
-                                 networkB = networkB, 
-                                 gene1 = gene1, 
-                                 gene2 = "Gene7",
-                                 expressionMatrixA = testMatrixA,
-                                 expressionMatrixB = testMatrixB))
+                                 gene2 = gene2))
 })

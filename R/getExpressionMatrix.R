@@ -44,6 +44,8 @@ getExpressionMatrix <- function(srat,
                                 cellType = NULL,
                                 minCellCount = 5) {
   
+  # --- Check some conditions to stop early if necessary --------------------
+  
   if (! inherits(srat, "Seurat")) {
     stop("The input you provided for srat is not a Seurat object. You must pass 
          a seurat object containing normalized scRNA counts data.")
@@ -61,6 +63,8 @@ getExpressionMatrix <- function(srat,
          object you provided. Re-run with a valid cell type or no cell type.")
   }
   
+  # --- Filter out certain genes ---------------------------------------------
+  
   # Get a matrix of normalized values from the Seurat object
   dataMatrix <- as.matrix(Seurat::GetAssayData(srat,
                                                assay = "RNA", 
@@ -72,6 +76,8 @@ getExpressionMatrix <- function(srat,
   
   # Extract the expression matrix for the selected genes
   expressionMatrix <- dataMatrix[variableGenes, ]
+  
+  # --- Filter out cells that are not of the needed cell type -----------------
   
   # Filter by a cell type if applicable
   if (! is.null(cellType)) {

@@ -1,6 +1,6 @@
-#' Given two coexpression networks and expression matrices that were made
-#' under two different 'conditions' (e.g. two different cell types) and two
-#' co-expressed genes, plot the expression level of each gene across cells
+#' Given a table of differentially coexpressed genes, the expression matrices
+#' that were used to generate the table of differentially coexpressed genes, and
+#' two coexpressed genes, plot the expression level of each gene across cells
 #' under each condition as a scatter plot. The x-axis is expression of one gene 
 #' and the y-axis is expression of the other gene. Each point represents the 
 #' expression level of one gene in one cell under one condition vs. the 
@@ -9,21 +9,32 @@
 #' diagonal. Genes that are differentially coexpressed will have different 
 #' patterns of scatter across the two different conditions. 
 #' 
-#' @param networkA An edge list for a coexpression network. Contains the
-#'     correlation coefficient between pairs of genes. 
-
-#' @param networkB An edge list for a different co-expression network. 
-#'     Contains the correlation coefficient between pairs of genes. 
-#' 
-#' @param gene1 A gene name
-#' 
-#' @param gene2 Another gene name. Gene1 and Gene2 should be coexpressed.
+#' @param diffCoexpTable A dataframe containing pairs of genes and their
+#'     correlations in two networks: networkA and networkB. Also contains
+#'     the log2FC
 #' 
 #' @param expressionMatrixA The expression matrix that was used to create
 #'     networkA
 #'     
 #' @param expressionMatrixB The expression matrix that was used to create
 #'     networkB
+#'     
+#' @param gene1 A gene name
+#' 
+#' @param gene2 Another gene name. Gene1 and Gene2 should be coexpressed. 
+#'
+#' @param conditionA an optional parameter to specify the condition/cell type
+#'     that corresponds to expressionMatrixA
+#'
+#' @param conditionB an optional parameter to specify the condition/cell type
+#'     that corresponds to expressionMatrixB   
+#'
+#' Note: this function assumes that the parameters are passed in the correct
+#' order. That is, expressionMatrixA was used to generate the correlation
+#' values stored in diffCoexpTable$CorrelationA, and expressionMatrixB was
+#' used to generate the correlation values stored in 
+#' diffCoexpTable$CorrelationB. Running the function in the incorrect order
+#' most likely will not throw errors, but the results will not be meaningful. 
 #'     
 #' @examples
 #' # Using an example data that was generated using the pbmc data that is
@@ -61,128 +72,138 @@
 #' # Delete the first column 
 #' coexprNetDC <- coexprNetDC[, -1]
 #' 
+#' diffCoexpTable <- getDifferentialCoexpression(networkA = coexprNetPlatelet, 
+#'                                               networkB = coexprNetDC)
+#' 
 #' gene1 <- 'ADH5'
 #' gene2 <- 'C4orf3'
-#' 
-#' plot <- plotDifferentialCoexpression(networkA = coexprNetPlatelet, 
-#'                                      networkB = coexprNetDC, 
+#'
+#' plot <- plotDifferentialCoexpression(diffCoexpTable = diffCoexpTable,
+#'                                      expressionMatrixA = exprMatrixPlatelet,
+#'                                      expressionMatrixB = exprMatrixDC, 
 #'                                      gene1 = gene1, 
 #'                                      gene2 = gene2,
-#'                                      expressionMatrixA = exprMatrixPlatelet,
-#'                                      expressionMatrixB = exprMatrixDC)
+#'                                      conditionA = "platelets", 
+#'                                      conditionB = "DC")
 #' plot
 #' 
 #' @return a scatter plot of expression level of gene1 vs. expression level of
 #'     gene 2 under two different conditions
 #' 
 #' @import ggplot2
-#' @importFrom dplyr inner_join 
 #' @export
-plotDifferentialCoexpression <- function(networkA, 
-                                         networkB, 
+plotDifferentialCoexpression <- function(diffCoexpTable,
+                                         expressionMatrixA,
+                                         expressionMatrixB,
                                          gene1, 
                                          gene2,
-                                         expressionMatrixA,
-                                         expressionMatrixB) {
-  # Some checks for invalid input
+                                         conditionA = NULL, 
+                                         conditionB = NULL) {
+  
+  # --- Check for invalid input ----------------------------------------------
+
   checkForIncorrectInput(exprMatrix = expressionMatrixA, 
-                         coexprNetwork = networkA, 
                          gene1 = gene1, 
                          gene2 = gene2)
   checkForIncorrectInput(exprMatrix = expressionMatrixB, 
-                         coexprNetwork = networkB, 
                          gene1 = gene1, 
                          gene2 = gene2)
   
-  networkA <- normalizeGenePairs(networkA)
-  networkB <- normalizeGenePairs(networkB)
+  if(nrow(diffCoexpTable) == 0) {
+    stop("The differential coexpression data frame you provided is empty.
+         Provide a non-empty data frame.")
+  }
   
-  # Merge the edge lists for both networks
-  mergedList <- networkA %>%
-    dplyr::inner_join(networkB, by = c("Gene1", "Gene2"), 
-                      suffix = c("_A", "_B"))
+  requiredColumns <- c("Gene1", 
+                       "Gene2",
+                       "CorrelationA", 
+                       "CorrelationB", 
+                       "foldChange")
   
-  # Calculate the fold change
-  mergedList$foldChange <- with(mergedList, 
-                                 log2(Correlation_B / Correlation_A))
+  if(! (all(requiredColumns %in% names(diffCoexpTable)))) {
+    stop("The dataframe you provided for diffCoexpTable does not have all the
+         needed columns. Please provide a dataframe with the columns Gene1, 
+         Gene2, CorrelationA, CorrelationB, and foldChange")
+  }
   
-  coexpressedGenes <- checkGeneCoexpression(mergedList = mergedList,
+  # --- Find gene pair and expression levels ---------------------------------
+  
+  coexpressedGenes <- checkGeneCoexpression(mergedList = diffCoexpTable,
                                             gene1 = gene1, 
                                             gene2 = gene2)
+  
   message(sprintf("%s and %s are coexpressed in both networks. In networkA, the
                   correlation is %s. In networkB, the correlation is %s. 
                   The log2 fold change in correlation is %s.", 
                   gene1, gene2, 
-                  coexpressedGenes$Correlation_A, 
-                  coexpressedGenes$Correlation_B, 
+                  coexpressedGenes$CorrelationA, 
+                  coexpressedGenes$CorrelationB, 
                   coexpressedGenes$foldChange))
   
   message("Plotting expression levels...")
   
+  # --- Structure data for plotting -----------------------------------------
+  
   # Extract expression levels for both genes and store each in a data frame
+  exprAGene1 <- t(expressionMatrixA[gene1, ])
+  exprAGene2 <- t(expressionMatrixA[gene2, ])
+  exprBGene1 <- t(expressionMatrixB[gene1, ])
+  exprBGene2 <- t(expressionMatrixB[gene2, ])
+  
   exprA <- data.frame(
-    t(expressionMatrixA[gene1, ]),
-    t(expressionMatrixA[gene2, ])
+    ExpressionGene1 = exprAGene1[,1],
+    ExpressionGene2 = exprAGene2[,1]
   )
-  colnames(exprA) <- c('ExpressionGene1', 'ExpressionGene2')
   
   exprB <- data.frame(
-    t(expressionMatrixB[gene1, ]),
-    t(expressionMatrixB[gene2, ])
+    ExpressionGene1 = exprBGene1[,1],
+    ExpressionGene2 = exprBGene2[,1]
   )
-  colnames(exprB) <- c('ExpressionGene1', 'ExpressionGene2')
-
-  exprA$Condition <- "Condition A"
-  exprB$Condition <- "Condition B"
+  
+  if (! is.null(conditionA)) {
+    exprA$Network <- conditionA
+  } else {
+    exprA$Network <- "Network A"
+  }
+  
+  if (! is.null(conditionB)) {
+    exprB$Network <- conditionB
+  } else {
+    exprB$Network <- "Network B"
+  } 
   
   # Create a ggplot
   plot <- 
     ggplot2::ggplot() +
     ggplot2::geom_point(data = exprA, ggplot2::aes(x = ExpressionGene1, 
                                                    y = ExpressionGene2, 
-                                                   color = Condition),
+                                                   color = Network),
                         size = 2) +
     ggplot2::geom_point(data = exprB, ggplot2::aes(x = ExpressionGene1, 
                                                    y = ExpressionGene2, 
-                                                   color = Condition), 
+                                                   color = Network), 
                         size = 2) +
     ggplot2::labs(x = paste("Expression of", gene1),
                   y = paste("Expression of", gene2),
-                  title = paste("Coexpression of", gene1, "and", gene2)) +
+                  title = paste("Expression of", gene1, "vs.", gene2)) +
     ggplot2::theme_minimal() +
-    ggplot2::scale_color_manual(values = c("Condition A" = "blue", 
-                                           "Condition B" = "red")) +
+    ggplot2::scale_color_manual(values = c("Network A" = "blue", 
+                                           "Network B" = "red")) +
     ggplot2::theme_gray()
   
 
   return(plot)
 }
 
-#' 'Normalize' the coexpression network so that the gene that comes first
-#' alphabetically is always gene1. This makes sure that rows are removed 
-#' incorrectly. For example, if network A has gene1 = A and gene2 = B while
-#' network B has gene1 = B and gene2 = A, this pair should not be removed
-#' from the differential coexpression analysis
-#' 
-#' @param network a dataframe containing where rows are gene pairs and the 
-#'     corresponding correlation
-#'     
-#' @return the network but now Gene1 is always the gene that comes first
-#'     alphabetically
-normalizeGenePairs <- function(network) {
-  network$Gene1 <- pmin(network$Gene1, network$Gene2)
-  network$Gene2 <- pmax(network$Gene1, network$Gene2)
-  return(network)
-}
-
 #' Check if the expression matrix and coexpression network are valid input
 #' 
 #' @param exprMatrix an expression matrix
-#' @param coexprNetwork a coexpression network
 #' @param gene1 a gene name
 #' @param gene2 a different gene name
 #' 
-checkForIncorrectInput <- function(exprMatrix, coexprNetwork, gene1, gene2) {
+#' @return no return value but throw an error if applicable
+#' 
+checkForIncorrectInput <- function(exprMatrix, gene1, gene2) {
   
   if (! (gene1 %in% rownames(exprMatrix))) {
     stop("Gene1 is not present in one of the expression matrices provided.")
@@ -196,11 +217,6 @@ checkForIncorrectInput <- function(exprMatrix, coexprNetwork, gene1, gene2) {
     stop("Please input different genes for gene1 and gene2.")
   }
   
-  if (nrow(coexprNetwork) == 0) {
-    stop("One of the coexpression networks you provided is empty. Provide a 
-          non-empty network.")
-  }
-  
   if (nrow(exprMatrix) == 0) {
     stop("One of the expression matrices you provided is empty. Provide a 
           non-empty expression matrix")
@@ -209,11 +225,6 @@ checkForIncorrectInput <- function(exprMatrix, coexprNetwork, gene1, gene2) {
   if (! all(sapply(exprMatrix, is.numeric))) {
     stop("Some of the values in the expression matrix you provided are not 
          numeric. Remove non-numeric values.")
-  }
-  
-  if (! all(sapply(coexprNetwork$Correlation, is.numeric))) {
-    stop("Some of the correlation values in the coexpression network you 
-          provided are not numeric. Remove non-numeric values.")
   }
 }
 
@@ -235,20 +246,21 @@ checkForIncorrectInput <- function(exprMatrix, coexprNetwork, gene1, gene2) {
 #' @importFrom dplyr filter
 checkGeneCoexpression <- function(mergedList, gene1, gene2) {
   
-  sortedGenes <- sort(c(gene1, gene2))
-  normalizedGene1 <- sortedGenes[1]
-  normalizedGene2 <- sortedGenes[2]
-  
   # Check if the gene pair is in the merged list
   coexpressedPair <- mergedList %>%
-    dplyr::filter(Gene1 == normalizedGene1 & Gene2 == normalizedGene2)
+    dplyr::filter((Gene1 == gene1 & Gene2 == gene2) | 
+                    (Gene1 == gene2 & Gene2 == gene1))
   
   if (nrow(coexpressedPair) == 0) {
     stop(sprintf("The genes %s and %s are not coexpressed in both networks.\n", 
                  gene1, gene2),
          "Pairs of genes that are coexpressed in both networks are:\n",
-         paste(mergedList$Gene1, mergedList$Gene2, sep = "-", collapse = ", "))
+         paste(mergedList$Gene1, 
+               mergedList$Gene2, 
+               sep = " and ", 
+               collapse = ", "))
   } else {
-    return(coexpressedPair)
+    # In case there was a duplicate, return just the first row
+    return(coexpressedPair[1, ])
   }
 }

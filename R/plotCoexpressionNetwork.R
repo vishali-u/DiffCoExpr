@@ -24,9 +24,13 @@
 #' coexprNetworkGraph <- plotCoexpressionNetwork(edgeList = coexprNet)
 #' coexprNetworkGraph
 #' 
-#' @export
 #' @importFrom igraph graph_from_data_frame cluster_louvain V layout_with_fr
+#' @importFrom grDevices adjustcolor rainbow
+#' @importFrom graphics legend
+#' @export
 plotCoexpressionNetwork <- function(edgeList) {
+  
+  # --- Check some conditions to stop early if necessary --------------------
   
   if (!is.data.frame(edgeList)) {
     stop("The input must be a dataframe.")
@@ -36,6 +40,8 @@ plotCoexpressionNetwork <- function(edgeList) {
     stop("The coexpression network you provided is empty. Provide a non-empty 
          network.")
   }
+  
+  # --- Constructing graph and community detection --------------------
   
   networkGraph <- igraph::graph_from_data_frame(edgeList, 
                                                 directed = FALSE)
@@ -70,13 +76,14 @@ plotCoexpressionNetwork <- function(edgeList) {
                       layout = igraph::layout_with_fr(networkGraph),
                       vertex.color = "lightblue",
                       vertex.size = 3,
-                      edge.color = adjustcolor("grey", alpha.f = 0.3))
+                      edge.color = grDevices::adjustcolor("grey", 
+                                                          alpha.f = 0.3))
     
   } else {
     message(sprintf("There were %s communities detected.", length(communities)))
     
     # Assign a color to each community
-    communityColors <- rainbow(length(communities))
+    communityColors <- grDevices::rainbow(length(communities))
     vertexColor <- communityColors[communities$membership]
     
     # Create the graph and a legend
@@ -87,18 +94,18 @@ plotCoexpressionNetwork <- function(edgeList) {
                       vertex.color = adjustcolor(vertexColor, alpha.f = 0.7),
                       vertex.size = 3,
                       edge.color = adjustcolor("grey", alpha.f = 0.3))
-    legend("topright", 
-           legend = paste("Community", seq(length(communities))), 
-           col = communityColors, 
-           pch = 16, 
-           cex = 0.8,
-           ncol = ifelse(length(communities) > 10, 2, 1))
+    graphics::legend("topright", 
+                     legend = paste("Community", seq(length(communities))), 
+                     col = communityColors, 
+                     pch = 16, 
+                     cex = 0.8,
+                     ncol = ifelse(length(communities) > 10, 2, 1))
     
     # Print a list of the genes in each community to the screen
     printCommunities(networkGraph = networkGraph,
                      communities = communities)
   }
-  return(1)
+  return(invisible(NULL))
 }
 
 #' Print what genes are part of the same community

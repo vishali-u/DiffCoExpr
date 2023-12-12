@@ -28,9 +28,12 @@
 #' coexprNetwork <- getCoexpressionNetwork(correlationMatrix = corrMatrix)
 #' coexprNetwork
 #' 
+#' @importFrom stats quantile
 #' @export
 getCoexpressionNetwork <- function(correlationMatrix,
                                    thresholdCorrelation = 0.80) {
+  
+  # --- Check some conditions to stop early if necessary --------------------
   
   if (! is.matrix(correlationMatrix) && ! is.data.frame(correlationMatrix)) {
     stop("Please provide a matrix or data.frame object for correlationMatrix.")
@@ -52,6 +55,8 @@ getCoexpressionNetwork <- function(correlationMatrix,
             Using the default thresholdCorrelation of 0.80 instead.")
     thresholdCorrelation <- 0.80
   }
+  
+  # --- Filter out pairs of genes --------------------------------------------
   
   # Set correlation to NA where the correlation is less than or equal to 0
   correlationMatrix[correlationMatrix <= 0] <- NA
@@ -76,8 +81,8 @@ getCoexpressionNetwork <- function(correlationMatrix,
                                      Gene1 < Gene2)
   
   # Only keep the pairs that have a correlation higher than the threshold
-  cutoffValue <- quantile(positiveCorrelationPairs$Correlation, 
-                          thresholdCorrelation)
+  cutoffValue <- stats::quantile(positiveCorrelationPairs$Correlation, 
+                                 thresholdCorrelation)
   edgeList <- positiveCorrelationPairs[positiveCorrelationPairs$Correlation > 
                                          cutoffValue, ]
   
