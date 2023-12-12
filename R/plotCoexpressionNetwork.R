@@ -123,3 +123,5 @@ printCommunities <- function(networkGraph, communities) {
     cat(concatenatedGenes, "\n\n")
   }
 }
+
+# [END]

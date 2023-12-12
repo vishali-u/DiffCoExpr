@@ -264,3 +264,5 @@ checkGeneCoexpression <- function(mergedList, gene1, gene2) {
     return(coexpressedPair[1, ])
   }
 }
+
+# [END]

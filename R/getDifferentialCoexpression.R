@@ -73,5 +73,4 @@ getDifferentialCoexpression <- function(networkA,
   return(mergedList)
 }
 
-
-
+# [END]

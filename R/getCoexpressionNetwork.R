@@ -88,3 +88,5 @@ getCoexpressionNetwork <- function(correlationMatrix,
   
   return(edgeList)
 }
+
+# [END]

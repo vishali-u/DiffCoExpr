@@ -93,3 +93,5 @@ getExpressionMatrix <- function(srat,
   }
   return(expressionMatrix)
 }
+
+# [END]

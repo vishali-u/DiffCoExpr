@@ -126,3 +126,5 @@ getCorrelationMatrix <- function(expressionMatrix,
   
   return(correlationMatrix)
 }
+
+# [END]

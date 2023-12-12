@@ -224,9 +224,9 @@ server <- function(input, output, session) {
   
   # First dropdown menu
   observe({
-    req(input$cellTypeA)
+    req(input$cellTypesPath)
     
-    cellTypeFile <- input$cellTypeA
+    cellTypeFile <- input$cellTypesPath
     df <- read.csv(cellTypeFile$datapath)
     
     # Update cellTypes
@@ -247,7 +247,7 @@ server <- function(input, output, session) {
   startPrepareData <- eventReactive(eventExpr = input$button1, {
     
     DiffCoExpr::prepareData(geneMatrixPath = input$geneBCPath,
-                            cellTypesPath = input$cellTypesPath)
+                            cellTypesPath = input$cellTypesPath$datapath)
     
   })
   
