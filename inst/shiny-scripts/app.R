@@ -41,7 +41,7 @@ ui <- fluidPage(
       tags$p("Instructions: To build coexpression networks for a cell type,
              Below, enter or select values required to perform the analysis
              Default values are shown. Then press 'Generate Coexpression 
-             Networks'. Note this part may take up to 8 minutes. Navigate through 
+             Networks'. Note this part may take up to 10 minutes. Navigate through 
              the first 2 tabs to the right to explore the results."),
       
       br(),
@@ -129,8 +129,8 @@ ui <- fluidPage(
       tags$p("Instructions: To see pairs of differentially coexpressed genes 
              between the two chosen cell types, navigate to tab 3. Then, 
              to plot expression levels across cells for two genes that are
-             differentially coexpressed, select two genes below. Press 
-             'Run Differential Coexpression'."),
+             differentially coexpressed, select two genes below. See tab 3
+             for possible options. Press 'Run Differential Coexpression'."),
       
       selectizeInput("gene1", 
                      "Gene1: Select a gene.", 
