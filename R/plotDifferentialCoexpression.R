@@ -144,11 +144,15 @@ plotDifferentialCoexpression <- function(diffCoexpTable,
   
   # --- Structure data for plotting -----------------------------------------
   
+  # Convert expression matrices to dataframes
+  expressionMatrixA <- as.data.frame(expressionMatrixA)
+  expressionMatrixB <- as.data.frame(expressionMatrixB)
+  
   # Extract expression levels for both genes and store each in a data frame
-  exprAGene1 <- t(expressionMatrixA[gene1, ])
-  exprAGene2 <- t(expressionMatrixA[gene2, ])
-  exprBGene1 <- t(expressionMatrixB[gene1, ])
-  exprBGene2 <- t(expressionMatrixB[gene2, ])
+  exprAGene1 <- t(as.data.frame(expressionMatrixA[gene1, ]))
+  exprAGene2 <- t(as.data.frame(expressionMatrixA[gene2, ]))
+  exprBGene1 <- t(as.data.frame(expressionMatrixB[gene1, ]))
+  exprBGene2 <- t(as.data.frame(expressionMatrixB[gene2, ]))
   
   exprA <- data.frame(
     ExpressionGene1 = exprAGene1[,1],
@@ -160,14 +164,22 @@ plotDifferentialCoexpression <- function(diffCoexpTable,
     ExpressionGene2 = exprBGene2[,1]
   )
   
+  # Define color mappings based on the conditions
+  colorMappings <- c(
+    "Network A" = "blue", 
+    "Network B" = "red"
+  )
+  
   if (! is.null(conditionA)) {
     exprA$Network <- conditionA
+    names(colorMappings)[1] <- conditionA
   } else {
     exprA$Network <- "Network A"
   }
   
   if (! is.null(conditionB)) {
     exprB$Network <- conditionB
+    names(colorMappings)[2] <- conditionB
   } else {
     exprB$Network <- "Network B"
   } 
@@ -187,8 +199,7 @@ plotDifferentialCoexpression <- function(diffCoexpTable,
                   y = paste("Expression of", gene2),
                   title = paste("Expression of", gene1, "vs.", gene2)) +
     ggplot2::theme_minimal() +
-    ggplot2::scale_color_manual(values = c("Network A" = "blue", 
-                                           "Network B" = "red")) +
+    ggplot2::scale_color_manual(values = colorMappings) +
     ggplot2::theme_gray()
   
 

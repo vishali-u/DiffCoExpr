@@ -113,11 +113,12 @@ prepareData <- function(geneMatrixPath,
                             features = all.genes)
   features <- Seurat::VariableFeatures(object = srat)
   srat <- Seurat::RunPCA(srat,
-                         features = features)
+                         features = features,
+                         verbose = FALSE)
   
   # Cluster the cells
   srat <- Seurat::FindNeighbors(srat, dims = 1:10)
-  srat <- Seurat::FindClusters(srat, resolution = 0.5)
+  srat <- Seurat::FindClusters(srat, resolution = 0.5, verbose = FALSE)
   
   # Perform non-linear dimensional reduction
   srat <- Seurat::RunUMAP(srat, dims = 1:10)
@@ -131,7 +132,9 @@ prepareData <- function(geneMatrixPath,
   # --- Add cell type names based on cellTypes file ---------------------------
   
   # Find all marker genes for each cluster (to annotate with cell identity)
-  srat.markers <- Seurat::FindAllMarkers(srat, only.pos = TRUE)
+  srat.markers <- Seurat::FindAllMarkers(srat, 
+                                         only.pos = TRUE, 
+                                         verbose = FALSE)
   
   # Read in the cellTypes file and store data in a list
   originalCellTypes <- utils::read.csv(file = cellTypesPath)

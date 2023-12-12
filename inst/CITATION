@@ -1,0 +1,12 @@
+citHeader("To cite DiffCoExpr in publications use:")
+
+citEntry(entry = "Unpublished",
+  title        = "DiffCoExpr: An R Package for single cell coexpression analysis",
+  author       = "Vishali Umaiyalan",
+  note         = "Unpublished",
+  year         = "2023",
+
+  textVersion  =
+  paste("Umaiyalan, V. (2023) DiffCoExpr: An R Package for single cell coexpression analysis.
+        Unpublished. URL https://github.com/vishali-u/DiffCoExpr.")
+)

@@ -46,6 +46,10 @@ getDifferentialCoexpression <- function(networkA,
                                         thresholdLogFC = 0.50) {
   
   # --- Checks for invalid input -------------------------------------------
+  if (!is.data.frame(networkA) || !is.data.frame(networkB)) {
+    stop("One of the networks you provided is not a dataframe. Provide a 
+         dataframe object for both networks.")
+  }
   
   if (nrow(networkA) == 0 || nrow(networkB) == 0) {
     stop("One of the coexpression networks you provided is empty. Provide a 

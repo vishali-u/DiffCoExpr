@@ -23,7 +23,7 @@ ui <- fluidPage(
              package. Its purpose to demonstrate how DiffCoExpr can be used
              to construct and compare coexpression networks."),
       
-      # Add vertical space ----
+      # Add vertical space
       br(),
       
       tags$p("Description: DiffCoExpr can be used construct cell-type-specific
@@ -35,20 +35,18 @@ ui <- fluidPage(
              compare expression levels, under two different cell types (or more
              generally, two conditions), of two coexpressed genes."),
       
-      # Add vertical space ----
       br(),
       
-      # Accept input from the user ----
+      # Accept input from the user
       tags$p("Instructions: To build coexpression networks for a cell type,
              Below, enter or select values required to perform the analysis
              Default values are shown. Then press 'Generate Coexpression 
-             Networks'. Note this may take up to 5 minutes. Navigate through 
+             Networks'. Note this part may take up to 8 minutes. Navigate through 
              the first 2 tabs to the right to explore the results."),
       
-      # Add vertical space ----
       br(),
       
-      # Input files ----
+      # Input files
       useShinyalert(force = TRUE),  # Set up shinyalert
       uiOutput("tab1"),
       actionButton(inputId = "data1",
@@ -123,7 +121,7 @@ ui <- fluidPage(
       actionButton(inputId = "button1",
                    label = "Generate Coexpression Networks"),
       
-      # Add vertical spacing ----
+      # Add vertical spacing
       br(),
       br(),
       br(),
@@ -134,29 +132,31 @@ ui <- fluidPage(
              differentially coexpressed, select two genes below. Press 
              'Run Differential Coexpression'."),
       
-      selectInput("gene1", 
-                  "Gene1: Select a gene.", 
+      selectizeInput("gene1", 
+                     "Gene1: Select a gene.", 
                   choices = NULL),
       
-      selectInput("gene2", 
-                  "Gene2: Select a different gene.", 
-                  choices = NULL),
+      selectizeInput("gene2", 
+                     "Gene2: Select a different gene.", 
+                     choices = NULL),
       
       actionButton(inputId = "button2",
                    label = "Generate DiffCoExpr Plot"),
     ),
     
-    # Main panel for displaying outputs ----
+    # Main panel for displaying outputs
     mainPanel(
+      
+      tags$style(type = "text/css",
+                 ".shiny-output-error { visibility: hidden; }",
+                 ".shiny-output-error:before { visibility: hidden; }"
+      ),
       
       # Output: only show the coexpression network dataframe, the network
       # graph, the differential coexpression dataframe, and the differential
       # coexpression scatterplot
       tabsetPanel(type = "tabs",
                   tabPanel("Coexpressed Genes",
-                           h3("Instructions: Enter values and click 
-                              'Generate Coexpression Networks' at the bottom 
-                              left side."),
                            h3("Coexpression Network for Cell Type A:"),
                            br(),
                            verbatimTextOutput("CoexprNetwork")),
@@ -170,7 +170,7 @@ ui <- fluidPage(
                            h3("Genes that are differentially coexpressed between 
                               Cell Type A and Cell Type B:"),
                            br(),
-                           verbatimTextOutput("DiffCoExprTable")),
+                           verbatimTextOutput("DiffCoexpTable")),
                   
                   tabPanel("Differential Coexpression Plot",
                            h3("Expression levels for two genes that are 
@@ -184,13 +184,10 @@ ui <- fluidPage(
   )
 )
 
-# Define server logic for random distribution app ----
+# Define server logic for random distribution app
 server <- function(input, output, session) {
   
-  # Define the reactive value for status
-  status <- reactiveVal("Ready")
-  
-  # URLs for downloading data ----
+  # URLs for downloading data
   url1 <- a("Example Dataset: Gene BC Matrices", 
             href = paste("https://github.com/vishali-u/DiffCoExpr/tree/main",
                          "/inst/extdata/filtered_gene_bc_matrices", sep = ''))
@@ -226,7 +223,7 @@ server <- function(input, output, session) {
                type = "info")
   })
   
-  # Add to cellType drop-down menu ----
+  # Add to cellType drop-down menu
   
   cellTypes <- reactiveVal(NULL)
   
@@ -270,19 +267,22 @@ server <- function(input, output, session) {
   
   })
   
+  # Construct coexpression network for cell type A
   startCoExprNetA <- eventReactive(eventExpr = input$button1, {
     
     if ((! is.null(startPrepareData)) && (! is.null(startExprMatrixA))) {
       
+      exprMatrixA <- startExprMatrixA()
+      
       corrMatrixA <-
-        DiffCoExpr::getCorrelationMatrix(expressionMatrix = startExprMatrixA(),
+        DiffCoExpr::getCorrelationMatrix(expressionMatrix = exprMatrixA,
                                          minCellCount = as.numeric(input$minCellCount),
                                          minGeneCount = as.numeric(input$minGeneCount),
                                          minPt = as.numeric(input$thresholdVariation))
-
+      
       DiffCoExpr::getCoexpressionNetwork(correlationMatrix = corrMatrixA,
                                          thresholdCorrelation = as.numeric(input$thresholdCorrelation))
-      
+    
     }
   })
   
@@ -297,10 +297,12 @@ server <- function(input, output, session) {
   
   startCoExprNetB <- eventReactive(eventExpr = input$button1, {
     
-    if ((! is.null(startPrepareData)) && (! is.null(startExprMatrixA))) {
+    if ((! is.null(startPrepareData)) && (! is.null(startExprMatrixB))) {
+      
+      exprMatrixB <- startExprMatrixB()
       
       corrMatrixB <-
-        DiffCoExpr::getCorrelationMatrix(expressionMatrix = startExprMatrixB(),
+        DiffCoExpr::getCorrelationMatrix(expressionMatrix = exprMatrixB,
                                          minCellCount = as.numeric(input$minCellCount),
                                          minGeneCount = as.numeric(input$minGeneCount),
                                          minPt = as.numeric(input$thresholdVariation))
@@ -311,37 +313,88 @@ server <- function(input, output, session) {
     }
   })
   
+  # Add gene choices to the gene dropdown menus in the second part
+  gene1Choices <- reactiveVal(NULL)
+  gene2Choices <- reactiveVal(NULL)
+  
+  # Get differentially coexpressed genes
   startDiffCoExpr <- eventReactive(eventExpr = input$button1, {
     if ((! is.null(startCoExprNetA)) && (! is.null(startCoExprNetA))) {
-      DiffCoExpr::getDifferentialCoexpression(networkA = startCoExprNetA,
-                                              networkB = startCoExprNetB,
-                                              thresholdLogFC = as.numeric(input$thresholdFC))
+      
+      coexprNetA <- startCoExprNetA()
+      coexprNetB <- startCoExprNetB()
+      
+      diffCoexpTable <- 
+        DiffCoExpr::getDifferentialCoexpression(networkA = coexprNetA,
+                                                networkB = coexprNetB,
+                                                thresholdLogFC = as.numeric(input$thresholdFC))
+      
+      
+      gene1Choices(unique(diffCoexpTable$Gene1))
+      gene2Choices(unique(diffCoexpTable$Gene2))
+      
+      updateSelectInput(session, "gene1", choices = gene1Choices())
+      updateSelectInput(session, "gene2", choices = gene2Choices())
+      
+      diffCoexpTable
     }
   })
   
+  # observe({
+  #   updateSelectInput(session, "gene1", choices = gene1Choices())
+  #   updateSelectInput(session, "gene2", choices = gene2Choices())
+  # })
+  
+  # Plot for differentially coexpressed genes
   startDiffCoExprPlot <- eventReactive(eventExpr = input$button2, {
     if ((! is.null(startDiffCoExpr)) && (! is.null(startExprMatrixA)) &&
         (! is.null(startExprMatrixB))) {
+      
+      diffCoexpTable <- startDiffCoExpr()
+      
+      gene1 <- input$gene1
+      gene2 <- input$gene2
+      
+      exprMatrixB <- startExprMatrixB()
+      exprMatrixA <- startExprMatrixA()
+      
+      DiffCoExpr::plotDifferentialCoexpression(diffCoexpTable = diffCoexpTable,
+                                               expressionMatrixA = exprMatrixA,
+                                               expressionMatrixB = exprMatrixB,
+                                               gene1 = gene1,
+                                               gene2 = gene2,
+                                               conditionA = input$cellTypeA,
+                                               conditionB = input$cellTypeB)
+      
     }
   })
   
   # Only output one of the coexpression networks (the first one)
   output$CoexprNetwork <- renderPrint({
     if (! is.null(startCoExprNetA)) {
-      startCoExprNetA()
+      coexprNetwork <- startCoExprNetA()
+      coexprNetwork
     }
   })
   
   # Coexpression plotting
   output$CoexprNetworkPlot <- renderPlot({
     if (! is.null(startCoExprNetA))
-      DiffCoExpr::plotCoexpressionNetwork(edgeList = startCoExprNetA())
+      edgeList <- startCoExprNetA()
+      DiffCoExpr::plotCoexpressionNetwork(edgeList = edgeList)
   })
   
   # Table of differentially coexpressed genes
-  output$DiffCoExprTable <- renderPrint({
+  output$DiffCoexpTable <- renderPrint({
     if (! is.null(startDiffCoExpr)) {
-      startDiffCoExpr()
+      diffCoexpTable <- startDiffCoExpr()
+      diffCoexpTable
+    }
+  })
+  
+  output$DiffCoExprPlot <- renderPlot({
+    if (! is.null(startDiffCoExprPlot)) {
+      startDiffCoExprPlot()
     }
   })
 }

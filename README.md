@@ -17,9 +17,11 @@ co-expression analysis by operating at the single-cell level; most
 existing co-expression analysis tools use bulk-RNA-seq or microarray
 data. As such, most existing packages do not contain any functions that
 can only be applied to single-cell data (e.g., cell-type-specificity
-analysis).
+analysis). `DiffCoExpr` allows users to construct cell-type-specific
+co-expression networks, and subsequently analyze differences in
+co-expression of genes between different cell types.
 
-The `DiffCoExpr` package was developed using `R version 4.3.0`,
+The `DiffCoExpr` package was developed using `R version 4.3.2`,
 `Platform: x86_64-apple-darwin20.0/12.2.0 (64-bit)` and
 `Running under: macOS Sonoma 14.1`.
 
@@ -29,7 +31,6 @@ To install the latest version of the package:
 
 ``` r
 install.packages("devtools")
-library("devtools")
 devtools::install_github("vishali-u/DiffCoExpr", build_vignettes = TRUE)
 library("DiffCoExpr")
 ```
@@ -37,12 +38,10 @@ library("DiffCoExpr")
 To run the Shiny app:
 
 ``` r
-# in progress
+DiffCoExpr::runDiffCoExpr()
 ```
 
 ## Overview
-
-There are x functions in `DiffCoExpr`
 
 ``` r
 ls("package:DiffCoExpr")
@@ -50,7 +49,7 @@ data(package = "DiffCoExpr")
 browseVignettes("DiffCoExpr")
 ```
 
-`DiffCoExpr` contains 8 functions.
+`DiffCoExpr` contains 7 functions.
 
 1.  ***prepareData*** for constructing a Seurat object that normalizes
     scRNA-seq data, performs dimensional reduction on the data, clusters
@@ -59,28 +58,27 @@ browseVignettes("DiffCoExpr")
 2.  ***getExpressionMatrix*** for filtering genes and constructing a
     dense matrix of the log-normalized counts.
 
-3.  ***plotExpressionMatrix*** for making a heatmap of the expression
-    matrix.
-
-4.  ***getCorrelationMatrix*** for determining the correlation of every
+3.  ***getCorrelationMatrix*** for determining the correlation of every
     pair of gene and constructing a matrix where rows and columns are
     genes and the cells contain the correlation coefficient between the
     pair of genes.
 
-5.  ***plotCorrelationMatrix*** for making a heatmap of the correlation
-    matrix.
-
-6.  ***buildCoexpressionNetwork*** for filtering pairs of genes and
+4.  ***getCoexpressionNetwork*** for filtering pairs of genes and
     constructing an “edge list” where every pair of co-expressed genes
     are listed with the correlation coefficient between the pair.
 
-7.  ***plotCoexpressionNetwork*** for constructing a co-expression
+5.  ***plotCoexpressionNetwork*** for constructing a co-expression
     network graph where each gene is a node, and co-expressed genes are
-    connected with an edge.
+    connected with an edge. Can also detect communities of co-expressed
+    genes.
 
-8.  ***plotDifferentialCoexpression*** for plotting the distribution of
-    changes in correlation coefficients between pairs of genes from two
-    different co-expression networks.
+6.  ***getDifferentialCoexpression*** for identifying genes that are
+    differentially co-expressed between two conditions or two cell
+    types.
+
+7.  ***plotDifferentialCoexpression*** for plotting the correlation
+    between expression level of two genes across two different
+    conditions or two different cell types.
 
 The package also contains one scRNA sequencing dataset, for which there
 are three files (barcodes.tsv, genes.tsv, and matrix.mtx). Refer to
@@ -92,18 +90,18 @@ illustrated below.
 ## Contributions
 
 The author of the package is Vishali Umaiyalan. The author wrote the
-*prepareData* function, which normalizes, clusters, and annotates
-single-cell RNA-seq data using the standard Seurat pipeline. The
-*getExpressionMatrix* and *getCorrelationMatrix* were written solely by
-the author. The *plotExpressionMatrix* function and
-*plotCorrelationMatrix* functions both use the `ComplexHeatmap` package.
-The *buildCoexpressionNetwork* function was written solely by the
-author, but the approach to filtering gene pairs is similar to
+`prepareData` function, which normalizes, clusters, and annotates
+single-cell RNA-seq data using the standard `Seurat` pipeline. The
+`getExpressionMatrix` and `getCorrelationMatrix` were written solely by
+the author. The `getCoexpressionNetwork` function was written solely by
+the author, but the approach to filtering gene pairs is similar to
 approaches used in the `GWENA` package, which constructs co-expression
-networks from bulk RNA-seq data. The `plotCoexpressionNetwork` and
-`plotDifferentialCoexpression` functions were written soly by the
-author. No generative AI tools were used in the development of this
-package.
+networks from bulk RNA-seq data. The `plotCoexpressionNetwork` function
+was written by the author, but it uses the `igraph` package to generate
+the plot. The `getDifferentialCoexpression` function was written solely
+by the author. The `plotDifferentialCoexpression` function was written
+soly by the author but the graph was generated using `ggplot2`. No
+generative AI tools were used in the development of this package.
 
 ## References
 
