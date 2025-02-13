@@ -76,7 +76,7 @@ browseVignettes("DiffCoExpr")
     between expression level of two genes across two different
     conditions or two different cell types.
 
-The package also contains one scRNA sequencing dataset, for which there
+The package also contains one scRNA-seq dataset, for which there
 are three files (barcodes.tsv, genes.tsv, and matrix.mtx). Refer to
 package vignettes for more details. An overview of the package is
 illustrated below.
