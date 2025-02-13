@@ -8,16 +8,12 @@
 The main objective of DiffCoExpr is to construct co-expression networks
 from single-cell RNA-sequencing (scRNA-seq) data, and subsequently
 determine if different conditions within an individual (e.g. cell type)
-affect co-expression of genes. We refer to co-expression correlation as
-the correlation between the expression level between pairs of genes.
-`DiffCoExpr` improves the field encompassing co-expression analysis by
-including functions for co-expression matrix construction and
-comparison, all in one package. Additionally, this package improves
-co-expression analysis by operating at the single-cell level; most
+affect co-expression of genes. `DiffCoExpr` improves co-expression analysis by
+including functions to construct co-expression matrices and
+compare co-expression matrices, all in one package. Additionally, this package
+improves co-expression analysis by operating at the single-cell level; most
 existing co-expression analysis tools use bulk-RNA-seq or microarray
-data. As such, most existing packages do not contain any functions that
-can only be applied to single-cell data (e.g., cell-type-specificity
-analysis). `DiffCoExpr` allows users to construct cell-type-specific
+data. `DiffCoExpr` allows users to construct cell-type-specific
 co-expression networks, and subsequently analyze differences in
 co-expression of genes between different cell types.
 
